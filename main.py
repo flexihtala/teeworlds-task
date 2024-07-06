@@ -4,26 +4,27 @@ from player import Player
 import settings
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
-    clock = pygame.time.Clock()
-    player = Player()
-    running = True
+class Game():
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+        self.clock = pygame.time.Clock()
+        self.player = Player()
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    def run(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-        player.update()
-        screen.fill(settings.BACKGROUND_COLOR)
-        player.draw(screen)
-        pygame.display.flip()
-        clock.tick(settings.FPS)
+            self.player.update()
+            self.screen.fill(settings.BACKGROUND_COLOR)
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            self.clock.tick(settings.FPS)
 
-    pygame.quit()
 
 
 if __name__ == "__main__":
-    main()
+    Game().run()
