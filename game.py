@@ -1,8 +1,8 @@
 import pygame
 import sys
-import settings
-import utils
-from entities import PhysicsEntity
+from scripts.settings import *
+from scripts.utils import load_sprite
+from scripts.entities import PhysicsEntity
 
 
 class Game:
@@ -12,10 +12,10 @@ class Game:
         pygame.display.set_caption('Teeworlds Task')
 
         self.screen = pygame.display.set_mode(
-            (settings.WIDTH, settings.HEIGHT))
+            (WIDTH, HEIGHT))
 
         self.display = pygame.Surface(
-            (settings.WIDTH / 2, settings.HEIGHT / 2))
+            (WIDTH / 2, HEIGHT / 2))
 
         self.clock = pygame.time.Clock()
 
@@ -24,12 +24,12 @@ class Game:
         self.movement = [False, False]
 
         self.assets = {
-            'player': utils.load_sprite('player.png')
+            'player': load_sprite('player.png')
         }
 
     def run(self):
         while True:
-            self.display.fill(settings.BACKGROUND_COLOR)
+            self.display.fill(BACKGROUND_COLOR)
             self.player.update(((self.movement[1] - self.movement[0]) * 2, 0))
             self.player.render(self.display)
 
@@ -52,7 +52,7 @@ class Game:
                 pygame.transform.scale(self.display, self.screen.get_size()),
                 (0, 0))
             pygame.display.update()
-            self.clock.tick(settings.FPS)
+            self.clock.tick(FPS)
 
 
 if __name__ == "__main__":
