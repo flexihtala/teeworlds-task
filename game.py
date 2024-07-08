@@ -3,6 +3,7 @@ import sys
 from scripts.settings import *
 from scripts.utils import load_sprite
 from scripts.entities import PhysicsEntity
+from scripts.tilemap import Tilemap
 
 
 class Game:
@@ -24,12 +25,16 @@ class Game:
         self.movement = [False, False]
 
         self.assets = {
+            'grass': load_sprite('tiles/grass.png'),
             'player': load_sprite('player.png')
         }
+
+        self.tilemap = Tilemap(self, 16)
 
     def run(self):
         while True:
             self.display.fill(BACKGROUND_COLOR)
+            self.tilemap.render(self.display)
             self.player.update(((self.movement[1] - self.movement[0]) * 2, 0))
             self.player.render(self.display)
 

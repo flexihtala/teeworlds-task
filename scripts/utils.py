@@ -1,6 +1,6 @@
 import pygame
 
-BASE_SPRITE_PATH = '../assets/sprites/'
+BASE_SPRITE_PATH = 'assets/sprites/'
 
 
 def load_sprite(path):
