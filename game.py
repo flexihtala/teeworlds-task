@@ -20,7 +20,7 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.player = PhysicsEntity(self, (50, 50), (15, 32))
+        self.player = PhysicsEntity(self, (50, 50), (10, 16))
 
         self.movement = [False, False]
 
@@ -35,7 +35,7 @@ class Game:
         while True:
             self.display.fill(BACKGROUND_COLOR)
             self.tilemap.render(self.display)
-            self.player.update(((self.movement[1] - self.movement[0]) * 2, 0))
+            self.player.update(self.tilemap, ((self.movement[1] - self.movement[0]) * 2, 0))
             self.player.render(self.display)
 
             for event in pygame.event.get():
