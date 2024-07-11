@@ -42,8 +42,8 @@ class Tilemap:
                 rects.append(rect)
         return rects
 
-    def render(self, surface):
+    def render(self, surface, offset=(0, 0)):
         for tile in self.tilemap.values():
             tile_pos = (tile['pos'][0] * self.tile_size,
                         tile['pos'][1] * self.tile_size)
-            surface.blit(self.game.assets[tile['type']], tile_pos)
+            surface.blit(self.game.assets[tile['type']], (tile_pos[0] - offset[0], tile_pos[1] - offset[1]))
