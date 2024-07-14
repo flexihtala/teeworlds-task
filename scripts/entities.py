@@ -1,5 +1,6 @@
 import pygame
 
+
 class PhysicsEntity:
     def __init__(self, game, pos, size):
         self.game = game
@@ -9,6 +10,7 @@ class PhysicsEntity:
         self.collisions = {'up': False, 'down': False,
                            'right': False, 'left': False}
         self.g = 0.03
+        self.jumps = 0
 
     def update(self, tilemap, movement=(0, 0)):
         self.collisions = {'up': False, 'down': False,
@@ -35,6 +37,7 @@ class PhysicsEntity:
                 if frame_movement[1] > 0:
                     entity_rect.bottom = rect.top
                     self.collisions['down'] = True
+                    self.jumps = 2
                 if frame_movement[1] < 0:
                     entity_rect.top = rect.bottom
                     self.collisions['up'] = True
@@ -49,3 +52,8 @@ class PhysicsEntity:
 
     def render(self, surface, offset=(0, 0)):
         surface.blit(self.game.assets['player'], (self.pos[0] - offset[0], self.pos[1] - offset[1]))
+
+    def jump(self):
+        if self.jumps:
+            self.velocity[1] = -3
+            self.jumps -= 1
