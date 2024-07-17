@@ -116,9 +116,9 @@ class Game:
                             self.players[addr] = PhysicsEntity(self, (pdata['x'], pdata['y']), (10, 16))
                         else:
                             self.players[addr].pos = (pdata['x'], pdata['y'])
-                    print(self.players)
+                    print(self.players_data)
             except:
-                break
+                print("Я сдох")
 
     def render_players(self, render_scroll):
         for player in self.players.values():
