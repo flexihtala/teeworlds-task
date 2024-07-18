@@ -17,8 +17,8 @@ class Tilemap:
             self.tilemap[str(3 + i) + ';10'] = {'type': 'grass',
                                                 'pos': (3 + i, 10)}
         for i in range(10):
-            self.tilemap['10;' + str(3 + i)] = {'type': 'grass',
-                                                'pos': (10, 3 + i)}
+            self.tilemap[str(3 + i) + ';20'] = {'type': 'grass',
+                                                'pos': (3 + i, 20)}
 
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""

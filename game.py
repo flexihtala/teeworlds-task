@@ -86,8 +86,10 @@ class Game:
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.movement[0] = False
+                        self.player.velocity[0] = 0
                     if event.key == pygame.K_d:
                         self.movement[1] = False
+                        self.player.velocity[0] = 0
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 3:
                         mouse_pos = pygame.mouse.get_pos()
@@ -128,9 +130,8 @@ class Game:
                             self.players[addr].pos = (pdata['x'], pdata['y'])
                             self.hooks[addr].pos = (pdata['hook_x'], pdata['hook_y'])
                             self.hooks[addr].is_rope_torn = (pdata['is_rope_torn'])
-                    print(self.players_data)
             except:
-                print("Я сдох")
+                pass
 
     def render_players(self, render_scroll):
         for player in self.players.values():
