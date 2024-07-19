@@ -13,7 +13,6 @@ class Hook:
         self.is_hooked = False
         self.max_length = 200
         self.is_rope_torn = True
-        self.ticks_count = 0
         self.tension_coefficient = 0.1  # коэффициент натяжения (увеличен для большей силы притяжения)
 
     def shoot(self, direction):
@@ -24,7 +23,6 @@ class Hook:
             self.length = 0
 
     def update(self, tilemap):
-        self.ticks_count += 1
         if not pygame.mouse.get_pressed()[2]:
             self.is_rope_torn = True
             self.is_hooked = False
@@ -43,7 +41,6 @@ class Hook:
             for rect in tilemap.physics_rects_around(self.pos):
                 if pygame.Rect(rect).collidepoint(self.pos):
                     self.is_hooked = True
-                    self.ticks_count = 0
                     break
 
     def pull_player(self):

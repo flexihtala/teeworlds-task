@@ -9,6 +9,7 @@ from scripts.utils import load_sprite
 from scripts.entities import PhysicsEntity
 from scripts.tilemap import Tilemap
 from scripts.tools.hook import Hook
+from scripts.tools.rpg import Rpg
 
 
 class Game:
@@ -29,7 +30,7 @@ class Game:
 
         self.assets = {
             'grass': load_sprite('tiles/grass.png'),
-            'player': load_sprite('player.png')
+            'player': load_sprite('player.png'),
         }
 
         self.tilemap = Tilemap(self, 16)
@@ -37,6 +38,7 @@ class Game:
         self.scroll = [0, 0]
         self.camera_speed = 30
         self.hook = Hook(self, self.player)
+        self.rpg = Rpg(self, self.player)
 
         self.host = '192.168.1.125'
         self.port = 5555
@@ -71,6 +73,9 @@ class Game:
             self.hook.update(self.tilemap)
             self.hook.render(self.display, render_scroll)
 
+            self.rpg.render(self.display, pygame.mouse.get_pos(), render_scroll)
+            self.rpg.update(self.tilemap)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -91,13 +96,15 @@ class Game:
                         self.movement[1] = False
                         self.player.velocity[0] = 0
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    world_mouse_pos = (mouse_pos[0], mouse_pos[1])
+                    direction = (world_mouse_pos[0] - WIDTH / 2, world_mouse_pos[1] - HEIGHT / 2)
+                    length = math.sqrt(direction[0] * direction[0] + direction[1] * direction[1])
+                    direction = (direction[0] / length, direction[1] / length)
                     if event.button == 3:
-                        mouse_pos = pygame.mouse.get_pos()
-                        world_mouse_pos = (mouse_pos[0], mouse_pos[1])
-                        direction = (world_mouse_pos[0] - WIDTH / 2, world_mouse_pos[1] - HEIGHT / 2)
-                        length = math.sqrt(direction[0] * direction[0] + direction[1] * direction[1])
-                        direction = (direction[0] / length, direction[1] / length)
                         self.hook.shoot(direction)
+                    if event.button == 1:
+                        self.rpg.shoot(direction)
 
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))

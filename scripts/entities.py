@@ -45,6 +45,13 @@ class PhysicsEntity:
                     self.collisions['up'] = True
                 self.pos[1] = entity_rect.y
         self.velocity[1] = min(5, self.velocity[1] + self.g)
+        if self.collisions['down']:
+            if abs(self.velocity[0]) < 0.2:
+                self.velocity[0] = 0
+            elif self.velocity[0] > 0:
+                self.velocity[0] -= 0.2
+            else:
+                self.velocity[0] += 0.2
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 0
 
@@ -53,7 +60,10 @@ class PhysicsEntity:
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
-        surface.blit(self.game.assets['player'], (self.pos[0] - offset[0], self.pos[1] - offset[1]))
+        image = self.game.assets['player']
+        if self.velocity[0] < 0:
+            image = pygame.transform.flip(image, True, False)
+        surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
     def jump(self):
         if self.jumps:
