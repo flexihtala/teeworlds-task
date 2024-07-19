@@ -1,4 +1,5 @@
 import pygame
+from scripts.settings import WIDTH
 
 
 class PhysicsEntity:
@@ -11,6 +12,7 @@ class PhysicsEntity:
                            'right': False, 'left': False}
         self.g = 0.03
         self.jumps = 0
+        self.direction = 'right'
 
     def update(self, tilemap, movement=(0, 0)):
         self.collisions = {'up': False, 'down': False,
@@ -55,13 +57,18 @@ class PhysicsEntity:
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 0
 
+        if pygame.mouse.get_pos()[0] > WIDTH // 2:
+            self.direction = 'right'
+        else:
+            self.direction = 'left'
+
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1],
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
         image = self.game.assets['player']
-        if self.velocity[0] < 0:
+        if self.direction == 'right':
             image = pygame.transform.flip(image, True, False)
         surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
