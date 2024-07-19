@@ -10,6 +10,7 @@ from scripts.entities import PhysicsEntity
 from scripts.tilemap import Tilemap
 from scripts.tools.hook import Hook
 from scripts.tools.rpg import Rpg
+from scripts.tools.minigun import Minigun
 
 
 class Game:
@@ -39,6 +40,7 @@ class Game:
         self.camera_speed = 30
         self.hook = Hook(self, self.player)
         self.rpg = Rpg(self, self.player)
+        self.minigun = Minigun(self, self.player)
 
         self.host = '192.168.1.125'
         self.port = 5555
@@ -73,8 +75,11 @@ class Game:
             self.hook.update(self.tilemap)
             self.hook.render(self.display, render_scroll)
 
-            self.rpg.render(self.display, pygame.mouse.get_pos(), render_scroll)
-            self.rpg.update(self.tilemap)
+            # self.rpg.render(self.display, pygame.mouse.get_pos(), render_scroll)
+            # self.rpg.update(self.tilemap)
+
+            self.minigun.render(self.display, pygame.mouse.get_pos(), render_scroll)
+            self.minigun.update(self.tilemap)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -105,6 +110,11 @@ class Game:
                         self.hook.shoot(direction)
                     if event.button == 1:
                         self.rpg.shoot(direction)
+                        self.minigun.shoot(direction)
+                        self.minigun.is_shooting = True
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        self.minigun.is_shooting = False
 
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))

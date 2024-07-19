@@ -2,6 +2,7 @@ import pygame
 import math
 from scripts.utils import load_sprite
 from scripts.settings import WIDTH, HEIGHT
+from scripts.tools.weapon_rotate import get_rotated_parameters
 
 
 class Rpg:
@@ -9,7 +10,8 @@ class Rpg:
         self.game = game
         self.player = player
         self.bullets = []
-        self.image = load_sprite('tools/rpg.png')
+        # todo добавить удаление пуль, которые уже взорвались/исчезли
+        self.image = load_sprite('tools/rpg/rpg.png')
         self.scale_mult = 10
         # координаты ключевой точки относительно левого верхнего угла картинки
         self.key_point = (30, 30)
@@ -30,19 +32,6 @@ class Rpg:
         self.ticks += 1
         for bullet in self.bullets:
             bullet.update(tilemap)
-
-    def get_rotated_parameters(self, image, pos, origin_pos, angle):
-        """Сложный страшный метод, писал 2 часа, добивал при помощи китайца со стаковерфлоу,
-             высчитывает координаты повернутой фигуры image на угол angle
-             pos - финальная позиция на экране,
-             origin_pos - позиция точки поворота относительно верхнего левого угла исходной картинки"""
-        image_rect = image.get_rect(topleft=(pos[0] - origin_pos[0], pos[1] - origin_pos[1]))
-        offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
-        rotated_offset = offset_center_to_pivot.rotate(-angle)
-        rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
-        rotated_image = pygame.transform.rotate(image, angle)
-        rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
-        return rotated_image, rotated_image_rect
 
     def render(self, surface, mouse_coord, offset=(0, 0)):
         for bullet in self.bullets:
@@ -71,14 +60,14 @@ class Rpg:
             self.is_bullet_flipped = False
         self.angle = angle
 
-        surface.blit(*self.get_rotated_parameters(flipped_image, (center_x - offset[0], center_y - offset[1] + 4),
-                                                  origin_pos, -angle))
+        surface.blit(*get_rotated_parameters(flipped_image, (center_x - offset[0], center_y - offset[1] + 4),
+                                             origin_pos, -angle))
 
 
 class Bullet:
     def __init__(self, game, pos, direction, is_bullet_flipped, angle, range1=200, speed=5):
         self.game = game
-        self.image = load_sprite('tools/bullet_rpg.png')
+        self.image = load_sprite('tools/rpg/bullet_rpg.png')
         self.image = pygame.transform.scale(self.image,
                                             (self.image.get_rect().width // 10,
                                              self.image.get_rect().height // 10))
@@ -163,13 +152,12 @@ class Bullet:
                 self.explosion_group.update()
 
 
-
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         for num in range(1, 6):
-            img = pygame.image.load(f"assets/sprites/tools/exploding/exp{num}.png")
+            img = pygame.image.load(f"assets/sprites/tools/rpg/exploding/exp{num}.png")
             img = pygame.transform.scale(img, (40, 40))
             self.images.append(img)
         self.index = 0
@@ -179,7 +167,7 @@ class Explosion(pygame.sprite.Sprite):
         self.counter = 0
 
     def update(self):
-        explosion_speed = 4
+        explosion_speed = 2
         #update explosion animation
         self.counter += 1
 
