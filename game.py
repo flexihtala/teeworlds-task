@@ -6,11 +6,11 @@ import threading
 import math
 from scripts.settings import *
 from scripts.utils import load_sprite
-from scripts.entities import PhysicsEntity
+from scripts.player import Player
 from scripts.tilemap import Tilemap
 from scripts.tools.hook import Hook
-from scripts.tools.rpg import Rpg
-from scripts.tools.minigun import Minigun
+from scripts.tools.rpg.rpg import Rpg
+from scripts.tools.minigun.minigun import Minigun
 
 
 class Game:
@@ -25,7 +25,7 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.player = PhysicsEntity(self, (50, 50), (10, 16))
+        self.player = Player(self, (50, 50), (10, 16))
 
         self.movement = [False, False]
 
@@ -41,6 +41,8 @@ class Game:
         self.hook = Hook(self, self.player)
         self.rpg = Rpg(self, self.player)
         self.minigun = Minigun(self, self.player)
+        self.weapons = [self.rpg, self.minigun]
+        self.current_weapon = self.weapons[0]
 
         self.host = '192.168.1.125'
         self.port = 5555
@@ -59,6 +61,11 @@ class Game:
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
+    def switch_weapon(self, direction):
+        current_index = self.weapons.index(self.current_weapon)
+        new_index = (current_index + direction) % len(self.weapons)
+        self.current_weapon = self.weapons[new_index]
+
     def run(self):
         while True:
             self.display.fill(BACKGROUND_COLOR)
@@ -75,11 +82,14 @@ class Game:
             self.hook.update(self.tilemap)
             self.hook.render(self.display, render_scroll)
 
+            self.current_weapon.render(self.display, pygame.mouse.get_pos(), render_scroll)
+            self.current_weapon.update(self.tilemap)
+
             # self.rpg.render(self.display, pygame.mouse.get_pos(), render_scroll)
             # self.rpg.update(self.tilemap)
-
-            self.minigun.render(self.display, pygame.mouse.get_pos(), render_scroll)
-            self.minigun.update(self.tilemap)
+            #
+            # self.minigun.render(self.display, pygame.mouse.get_pos(), render_scroll)
+            # self.minigun.update(self.tilemap)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -100,6 +110,7 @@ class Game:
                     if event.key == pygame.K_d:
                         self.movement[1] = False
                         self.player.velocity[0] = 0
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     world_mouse_pos = (mouse_pos[0], mouse_pos[1])
@@ -109,12 +120,16 @@ class Game:
                     if event.button == 3:
                         self.hook.shoot(direction)
                     if event.button == 1:
-                        self.rpg.shoot(direction)
-                        self.minigun.shoot(direction)
+                        self.current_weapon.shoot(direction)
                         self.minigun.is_shooting = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         self.minigun.is_shooting = False
+                elif event.type == pygame.MOUSEWHEEL:
+                    if event.y > 0:
+                        self.switch_weapon(1)
+                    elif event.y < 0:
+                        self.switch_weapon(-1)
 
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
@@ -141,7 +156,7 @@ class Game:
                     self.players_data.pop(self.address)
                     for addr, pdata in self.players_data.items():
                         if addr not in self.players:
-                            self.players[addr] = PhysicsEntity(self, (pdata['x'], pdata['y']), (10, 16))
+                            self.players[addr] = Player(self, (pdata['x'], pdata['y']), (10, 16))
                             self.hooks[addr] = Hook(self, self.players[addr])
                         else:
                             self.players[addr].pos = (pdata['x'], pdata['y'])
