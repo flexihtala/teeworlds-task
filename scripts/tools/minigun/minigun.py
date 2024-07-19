@@ -39,7 +39,7 @@ class Minigun:
         direction = (dx / length, dy / length)
         return direction
 
-    def update(self, tilemap):
+    def update(self, tilemap, _):
         self.ticks += 1
         for bullet in self.bullets:
             bullet.update(tilemap)
@@ -51,7 +51,6 @@ class Minigun:
     def give_player_impulse(self):
         self.player.velocity[0] -= self.force * math.cos(math.radians(self.angle))
         self.player.velocity[1] -= self.force * math.sin(math.radians(self.angle))
-
 
     def render(self, surface, mouse_coord, offset=(0, 0)):
         for bullet in self.bullets:

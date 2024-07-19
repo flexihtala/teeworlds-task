@@ -1,5 +1,8 @@
 import pygame
 from scripts.settings import WIDTH
+from scripts.tools.rpg.rpg import Rpg
+from scripts.tools.minigun.minigun import Minigun
+from scripts.tools.hook import Hook
 
 
 class Player:
@@ -16,7 +19,17 @@ class Player:
         self.max_health = 100
         self.health = self.max_health
 
+        self.rpg = Rpg(self.game, self)
+        self.minigun = Minigun(self.game, self)
+        self.weapons = [self.rpg, self.minigun]
+        self.current_weapon = self.weapons[0]
+
+        self.hook = Hook(self.game, self)
+
     def update(self, tilemap, movement=(0, 0)):
+        self.current_weapon.update(self.game.tilemap, self.game.render_scroll)
+        self.hook.update(self.game.tilemap)
+
         self.collisions = {'up': False, 'down': False,
                            'right': False, 'left': False}
         if movement[0] < 0:
@@ -74,6 +87,8 @@ class Player:
             image = pygame.transform.flip(image, True, False)
         surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
+        self.hook.render(self.game.display, self.game.render_scroll)
+        self.current_weapon.render(self.game.display, pygame.mouse.get_pos(), self.game.render_scroll)
         self.render_health_bar(surface, offset)
 
     def render_health_bar(self, surface, offset=(0, 0)):
@@ -99,3 +114,8 @@ class Player:
         self.health -= amount
         if self.health < 0:
             self.health = 0
+
+    def switch_weapon(self, direction):
+        current_index = self.weapons.index(self.current_weapon)
+        new_index = (current_index + direction) % len(self.weapons)
+        self.current_weapon = self.weapons[new_index]

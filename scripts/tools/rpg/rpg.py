@@ -29,10 +29,10 @@ class Rpg:
             # todo сделать вылет пули из дула, а не из центра игрока(не обязательно, но желательно)
             self.bullets.append(bullet)
 
-    def update(self, tilemap):
+    def update(self, tilemap, offset=(0, 0)):
         self.ticks += 1
         for bullet in self.bullets:
-            bullet.update(tilemap)
+            bullet.update(tilemap, offset)
 
     def render(self, surface, mouse_coord, offset=(0, 0)):
         for bullet in self.bullets:

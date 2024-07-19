@@ -8,9 +8,6 @@ from scripts.settings import *
 from scripts.utils import load_sprite
 from scripts.player import Player
 from scripts.tilemap import Tilemap
-from scripts.tools.hook import Hook
-from scripts.tools.rpg.rpg import Rpg
-from scripts.tools.minigun.minigun import Minigun
 
 
 class Game:
@@ -37,12 +34,8 @@ class Game:
         self.tilemap = Tilemap(self, 16)
 
         self.scroll = [0, 0]
+        self.render_scroll = (0, 0)
         self.camera_speed = 30
-        self.hook = Hook(self, self.player)
-        self.rpg = Rpg(self, self.player)
-        self.minigun = Minigun(self, self.player)
-        self.weapons = [self.rpg, self.minigun]
-        self.current_weapon = self.weapons[0]
 
         self.host = '192.168.1.125'
         self.port = 5555
@@ -61,35 +54,21 @@ class Game:
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
-    def switch_weapon(self, direction):
-        current_index = self.weapons.index(self.current_weapon)
-        new_index = (current_index + direction) % len(self.weapons)
-        self.current_weapon = self.weapons[new_index]
-
     def run(self):
         while True:
             self.display.fill(BACKGROUND_COLOR)
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0])
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1])
-            render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
+            self.render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
-            self.tilemap.render(self.display, render_scroll)
+            self.tilemap.render(self.display, self.render_scroll)
             self.player.update(self.tilemap,
                                ((self.movement[1] - self.movement[0]) * 2, 0))
-            self.player.render(self.display, render_scroll)
-            self.render_players(render_scroll)
+            self.player.render(self.display, self.render_scroll)
+            self.render_players(self.render_scroll)
 
-            self.hook.update(self.tilemap)
-            self.hook.render(self.display, render_scroll)
 
-            self.current_weapon.render(self.display, pygame.mouse.get_pos(), render_scroll)
-            self.current_weapon.update(self.tilemap)
 
-            # self.rpg.render(self.display, pygame.mouse.get_pos(), render_scroll)
-            # self.rpg.update(self.tilemap)
-            #
-            # self.minigun.render(self.display, pygame.mouse.get_pos(), render_scroll)
-            # self.minigun.update(self.tilemap)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -118,18 +97,18 @@ class Game:
                     length = math.sqrt(direction[0] * direction[0] + direction[1] * direction[1])
                     direction = (direction[0] / length, direction[1] / length)
                     if event.button == 3:
-                        self.hook.shoot(direction)
+                        self.player.hook.shoot(direction)
                     if event.button == 1:
-                        self.current_weapon.shoot(direction)
-                        self.minigun.is_shooting = True
+                        self.player.current_weapon.shoot(direction)
+                        self.player.minigun.is_shooting = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
-                        self.minigun.is_shooting = False
+                        self.player.minigun.is_shooting = False
                 elif event.type == pygame.MOUSEWHEEL:
                     if event.y > 0:
-                        self.switch_weapon(1)
+                        self.player.switch_weapon(1)
                     elif event.y < 0:
-                        self.switch_weapon(-1)
+                        self.player.switch_weapon(-1)
 
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
@@ -139,9 +118,9 @@ class Game:
     def send_player_info(self):
         self.player_info['x'] = self.player.pos[0]
         self.player_info['y'] = self.player.pos[1]
-        self.player_info['is_rope_torn'] = self.hook.is_rope_torn
-        self.player_info['hook_x'] = self.hook.pos[0]
-        self.player_info['hook_y'] = self.hook.pos[1]
+        self.player_info['is_rope_torn'] = self.player.hook.is_rope_torn
+        self.player_info['hook_x'] = self.player.hook.pos[0]
+        self.player_info['hook_y'] = self.player.hook.pos[1]
         self.player_info['direction'] = self.player.direction
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())

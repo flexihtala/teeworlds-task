@@ -25,7 +25,8 @@ class Bullet:
         self.explosion_group = pygame.sprite.Group()
         self.offset = (0, 0)
 
-    def update(self, tilemap):
+    def update(self, tilemap, offset=(0, 0)):
+        self.offset = offset
         if self.exploded:
             return
 
