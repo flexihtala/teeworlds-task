@@ -142,6 +142,7 @@ class Game:
         self.player_info['is_rope_torn'] = self.hook.is_rope_torn
         self.player_info['hook_x'] = self.hook.pos[0]
         self.player_info['hook_y'] = self.hook.pos[1]
+        self.player_info['direction'] = self.player.direction
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -154,12 +155,18 @@ class Game:
                 if data:
                     self.players_data = json.loads(data)
                     self.players_data.pop(self.address)
+                    current_addresses = set(self.players_data.keys())
+                    for addr in self.players.keys():
+                        if addr not in current_addresses:
+                            self.players.pop(addr)
+                            self.hooks.pop(addr)
                     for addr, pdata in self.players_data.items():
                         if addr not in self.players:
                             self.players[addr] = Player(self, (pdata['x'], pdata['y']), (10, 16))
                             self.hooks[addr] = Hook(self, self.players[addr])
                         else:
                             self.players[addr].pos = (pdata['x'], pdata['y'])
+                            self.players[addr].direction = pdata['direction']
                             self.hooks[addr].pos = (pdata['hook_x'], pdata['hook_y'])
                             self.hooks[addr].is_rope_torn = (pdata['is_rope_torn'])
             except:
