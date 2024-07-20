@@ -47,7 +47,7 @@ class Bullet:
 
     def explode(self):
         self.exploded = True
-        explosion = Explosion(self.pos[0] - self.offset[0], self.pos[1] - self.offset[1])
+        explosion = Explosion(self.pos[0] - self.offset[0], self.pos[1] - self.offset[1], self)
         self.explosion_group.add(explosion)
         # Check for players within the explosion radius
         for player in self.game.players.values():

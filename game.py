@@ -67,9 +67,6 @@ class Game:
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
 
-
-
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

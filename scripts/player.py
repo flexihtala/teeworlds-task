@@ -25,9 +25,14 @@ class Player:
         self.current_weapon = self.weapons[0]
 
         self.hook = Hook(self.game, self)
+        self.bullets = []
 
     def update(self, tilemap, movement=(0, 0)):
+        self.bullets = [bullet for bullet in self.bullets if bullet.is_exist]
         self.current_weapon.update(self.game.tilemap, self.game.render_scroll)
+        for bullet in self.bullets:
+            bullet.update(tilemap, self.game.render_scroll)
+
         self.hook.update(self.game.tilemap)
 
         self.collisions = {'up': False, 'down': False,
@@ -89,6 +94,8 @@ class Player:
 
         self.hook.render(self.game.display, self.game.render_scroll)
         self.current_weapon.render(self.game.display, pygame.mouse.get_pos(), self.game.render_scroll)
+        for bullet in self.bullets:
+            bullet.render(surface, offset)
         self.render_health_bar(surface, offset)
 
     def render_health_bar(self, surface, offset=(0, 0)):

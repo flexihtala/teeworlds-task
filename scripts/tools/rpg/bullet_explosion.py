@@ -2,8 +2,9 @@ import pygame
 
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, bullet):
         pygame.sprite.Sprite.__init__(self)
+        self.bullet = bullet
         self.images = []
         for num in range(1, 6):
             img = pygame.image.load(f"assets/sprites/tools/rpg/exploding/exp{num}.png")
@@ -24,3 +25,4 @@ class Explosion(pygame.sprite.Sprite):
             self.image = self.images[self.index]
         if self.index >= len(self.images) - 1 and self.counter >= explosion_speed:
             self.kill()
+            self.bullet.is_exist = False

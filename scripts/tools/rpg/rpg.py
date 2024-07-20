@@ -10,7 +10,6 @@ class Rpg:
     def __init__(self, game, player):
         self.game = game
         self.player = player
-        self.bullets = []
         # todo добавить удаление пуль, которые уже взорвались/исчезли
         self.image = load_sprite('tools/rpg/rpg.png')
         self.scale_mult = 10
@@ -27,17 +26,12 @@ class Rpg:
             self.ticks = 0
             bullet = Bullet(self.game, self.player.rect().center, direction, self.is_bullet_flipped, self.angle)
             # todo сделать вылет пули из дула, а не из центра игрока(не обязательно, но желательно)
-            self.bullets.append(bullet)
+            self.player.bullets.append(bullet)
 
     def update(self, tilemap, offset=(0, 0)):
         self.ticks += 1
-        for bullet in self.bullets:
-            bullet.update(tilemap, offset)
 
     def render(self, surface, mouse_coord, offset=(0, 0)):
-        for bullet in self.bullets:
-            bullet.render(surface, offset)
-
         center_x, center_y = self.player.rect().center
         scaled_image = pygame.transform.scale(self.image,
                                               (self.image.get_rect().width / self.scale_mult,
@@ -63,6 +57,3 @@ class Rpg:
 
         surface.blit(*get_rotated_parameters(flipped_image, (center_x - offset[0], center_y - offset[1] + 4),
                                              origin_pos, -angle))
-
-
-

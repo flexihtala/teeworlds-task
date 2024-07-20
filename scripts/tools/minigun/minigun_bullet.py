@@ -17,7 +17,7 @@ class Bullet:
         self.size = (10, 10)
         self.is_exist = True
 
-    def update(self, tilemap):
+    def update(self, tilemap, _):
         # Move bullet
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]

@@ -11,7 +11,6 @@ class Minigun:
     def __init__(self, game, player):
         self.game = game
         self.player = player
-        self.bullets = []
         # todo добавить удаление пуль, которые уже взорвались/исчезли
         self.image = load_sprite('tools/minigun/minigun.png')
         self.scale_mult = 10
@@ -29,7 +28,7 @@ class Minigun:
             bullet = Bullet(self.game, self.player.rect().center, direction)
             self.give_player_impulse()
             # todo сделать вылет пули из дула, а не из центра игрока(не обязательно, но желательно)
-            self.bullets.append(bullet)
+            self.player.bullets.append(bullet)
 
     def get_shooting_direction(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -41,8 +40,6 @@ class Minigun:
 
     def update(self, tilemap, _):
         self.ticks += 1
-        for bullet in self.bullets:
-            bullet.update(tilemap)
 
         if self.is_shooting:
             direction = self.get_shooting_direction()
@@ -53,9 +50,6 @@ class Minigun:
         self.player.velocity[1] -= self.force * math.sin(math.radians(self.angle))
 
     def render(self, surface, mouse_coord, offset=(0, 0)):
-        for bullet in self.bullets:
-            bullet.render(surface, offset)
-
         center_x, center_y = self.player.rect().center
         scaled_image = pygame.transform.scale(self.image,
                                               (self.image.get_rect().width / self.scale_mult,
