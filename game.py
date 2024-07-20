@@ -8,6 +8,8 @@ from scripts.settings import *
 from scripts.utils import load_sprite
 from scripts.player import Player
 from scripts.tilemap import Tilemap
+from scripts.tools.rpg import rpg_bullet
+from scripts.tools.minigun import minigun_bullet
 
 
 class Game:
@@ -119,6 +121,7 @@ class Game:
         self.player_info['hook_y'] = self.player.hook.pos[1]
         self.player_info['direction'] = self.player.direction
         self.player_info['mouse_pos'] = self.player.mouse_pos
+        self.player_info['bullets'] = [bullet.serialize() for bullet in self.player.bullets]
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -144,8 +147,19 @@ class Game:
                             self.players[addr].hook.is_rope_torn = pdata['is_rope_torn']
                             self.players[addr].hook.pos = (pdata['hook_x'], pdata['hook_y'])
                             self.players[addr].mouse_pos = pdata['mouse_pos']
+                            self.players[addr].bullets = [self.deserialize_bullet(bullet) for bullet in pdata['bullets']]
             except:
                 pass
+
+    def deserialize_bullet(self, bullet_info):
+        pos = bullet_info['pos']
+        direction = bullet_info['direction']
+        if bullet_info['bullet_type'] == 'rpg':
+            is_bullet_flipped = bullet_info['is_bullet_flipped']
+            angle = bullet_info['angle']
+            return rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle)
+        elif bullet_info['bullet_type'] == 'minigun':
+            return minigun_bullet.Bullet(self, pos, direction)
 
     def render_players(self, render_scroll):
         for player in self.players.values():

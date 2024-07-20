@@ -6,6 +6,7 @@ from scripts.utils import load_sprite
 class Bullet:
     def __init__(self, game, pos, direction, range1=200, speed=10):
         self.game = game
+        self.direction = direction
         self.image = load_sprite('tools/minigun/minigun_bullet.png')
         self.image = pygame.transform.scale(self.image,
                                             (self.image.get_rect().width // 10,
@@ -39,3 +40,10 @@ class Bullet:
     def render(self, surface, offset=(0, 0)):
         if self.is_exist:
             surface.blit(self.image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
+
+    def serialize(self):
+        return {
+            'pos': self.pos,
+            'direction': self.direction,
+            'bullet_type': 'minigun'
+        }

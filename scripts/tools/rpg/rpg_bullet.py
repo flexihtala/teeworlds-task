@@ -8,6 +8,7 @@ from scripts.utils import load_sprite
 class Bullet:
     def __init__(self, game, pos, direction, is_bullet_flipped, angle, range1=200, speed=5):
         self.game = game
+        self.direction = direction
         self.image = load_sprite('tools/rpg/bullet_rpg.png')
         self.image = pygame.transform.scale(self.image,
                                             (self.image.get_rect().width // 10,
@@ -92,3 +93,12 @@ class Bullet:
             else:
                 self.explosion_group.draw(surface)
                 self.explosion_group.update()
+
+    def serialize(self):
+        return {
+            'pos': self.pos,
+            'direction': self.direction,
+            'is_bullet_flipped': self.is_bullet_flipped,
+            'angle': self.angle,
+            'bullet_type': 'rpg'
+        }

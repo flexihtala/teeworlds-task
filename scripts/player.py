@@ -31,6 +31,7 @@ class Player:
     def update(self, tilemap, movement=(0, 0)):
         self.mouse_pos = pygame.mouse.get_pos()
         self.bullets = [bullet for bullet in self.bullets if bullet.is_exist]
+        print(self.bullets)
         self.current_weapon.update(self.game.tilemap, self.game.render_scroll)
         for bullet in self.bullets:
             bullet.update(tilemap, self.game.render_scroll)
