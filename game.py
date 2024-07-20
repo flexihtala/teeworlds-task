@@ -121,6 +121,7 @@ class Game:
         self.player_info['hook_y'] = self.player.hook.pos[1]
         self.player_info['direction'] = self.player.direction
         self.player_info['mouse_pos'] = self.player.mouse_pos
+        self.player_info['weapon_index'] = self.player.weapons.index(self.player.current_weapon)
         self.player_info['bullets'] = [bullet.serialize() for bullet in self.player.bullets]
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
@@ -147,7 +148,10 @@ class Game:
                             self.players[addr].hook.is_rope_torn = pdata['is_rope_torn']
                             self.players[addr].hook.pos = (pdata['hook_x'], pdata['hook_y'])
                             self.players[addr].mouse_pos = pdata['mouse_pos']
-                            self.players[addr].bullets = [self.deserialize_bullet(bullet) for bullet in pdata['bullets']]
+                            self.players[addr].current_weapon = self.players[addr].weapons[pdata['weapon_index']]
+                            bullets = [self.deserialize_bullet(bullet) for bullet in pdata['bullets']]
+                            self.players[addr].bullets = bullets
+                            self.player.other_bullets = bullets
             except:
                 pass
 
@@ -157,7 +161,9 @@ class Game:
         if bullet_info['bullet_type'] == 'rpg':
             is_bullet_flipped = bullet_info['is_bullet_flipped']
             angle = bullet_info['angle']
-            return rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle)
+            bullet = rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle)
+            bullet.exploded = bullet_info['is_exploded']
+            return bullet
         elif bullet_info['bullet_type'] == 'minigun':
             return minigun_bullet.Bullet(self, pos, direction)
 

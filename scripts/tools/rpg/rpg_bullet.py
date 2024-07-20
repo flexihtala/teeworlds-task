@@ -100,5 +100,6 @@ class Bullet:
             'direction': self.direction,
             'is_bullet_flipped': self.is_bullet_flipped,
             'angle': self.angle,
+            'is_exploded': self.exploded,
             'bullet_type': 'rpg'
         }
