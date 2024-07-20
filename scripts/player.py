@@ -9,6 +9,7 @@ class Player:
     def __init__(self, game, pos, size):
         self.game = game
         self.pos = list(pos)
+        self.mouse_pos = [0, 0]
         self.size = size
         self.velocity = [0, 0]
         self.collisions = {'up': False, 'down': False,
@@ -28,6 +29,7 @@ class Player:
         self.bullets = []
 
     def update(self, tilemap, movement=(0, 0)):
+        self.mouse_pos = pygame.mouse.get_pos()
         self.bullets = [bullet for bullet in self.bullets if bullet.is_exist]
         self.current_weapon.update(self.game.tilemap, self.game.render_scroll)
         for bullet in self.bullets:
@@ -93,7 +95,7 @@ class Player:
         surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
         self.hook.render(self.game.display, self.game.render_scroll)
-        self.current_weapon.render(self.game.display, pygame.mouse.get_pos(), self.game.render_scroll)
+        self.current_weapon.render(self.game.display, self.mouse_pos, self.game.render_scroll)
         for bullet in self.bullets:
             bullet.render(surface, offset)
         self.render_health_bar(surface, offset)
