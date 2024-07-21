@@ -4,6 +4,7 @@ import socket
 import json
 import threading
 import math
+import random
 from scripts.settings import *
 from scripts.utils import load_sprite
 from scripts.player import Player
@@ -25,16 +26,27 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.player = Player(self, (50, 50), (10, 16))
-
         self.movement = [False, False]
 
         self.assets = {
             'grass': load_sprite('tiles/grass.png'),
+            'left_grass': load_sprite('tiles/left_grass.png'),
+            'right_grass': load_sprite('tiles/right_grass.png'),
             'player': load_sprite('player.png'),
+            'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
+            'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
+            'ground': load_sprite('tiles/ground.png'),
+            'spawnpoint': None
         }
 
         self.tilemap = Tilemap(self, 16)
+        with open('save.json', 'r', encoding='utf-8') as file:
+            self.tilemap.tilemap = json.load(file)
+        self.tilemap.find_spawnpoints()
+
+        spawnpoint_pos = self.tilemap.spawnpoint_positions[random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
+        start_pos = [spawnpoint_pos[0] * 16, spawnpoint_pos[1] * 16]
+        self.player = Player(self, start_pos, (10, 16))
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
