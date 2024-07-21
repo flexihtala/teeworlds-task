@@ -8,6 +8,7 @@ from scripts.tools.hook import Hook
 class Player:
     def __init__(self, game, pos, size):
         self.game = game
+        self.name = ''
         self.pos = list(pos)
         self.mouse_pos = [0, 0]
         self.size = size
@@ -17,8 +18,8 @@ class Player:
         self.g = 0.03
         self.jumps = 0
         self.direction = 'right'
-        self.max_health = 100
-        self.health = self.max_health
+        self.max_hp = 100
+        self.hp = self.max_hp
 
         self.rpg = Rpg(self.game, self)
         self.minigun = Minigun(self.game, self)
@@ -36,7 +37,7 @@ class Player:
         for bullet in self.bullets:
             bullet.update(tilemap, self.game.render_scroll)
         for bullet in self.other_bullets:
-            bullet.update(tilemap, self.game.render_scroll)
+            bullet.update(tilemap, self.game.render_scroll, True)
 
         self.hook.update(self.game.tilemap)
 
@@ -104,20 +105,28 @@ class Player:
         for bullet in self.other_bullets:
             bullet.render(surface, offset)
         self.render_health_bar(surface, offset)
+        self.render_name(surface, offset)
 
     def render_health_bar(self, surface, offset=(0, 0)):
         bar_width = 20
         bar_height = 5
-        health_ratio = self.health / self.max_health
+        health_ratio = self.hp / self.max_hp
         health_bar_width = int(bar_width * health_ratio)
 
         health_bar_rect = pygame.Rect(self.pos[0] - offset[0] - (bar_width - self.size[0]) / 2,
-                                      self.pos[1] - offset[1] - 10, bar_width, bar_height)
+                                      self.pos[1] - offset[1] - 10 + 3, bar_width, bar_height)
         current_health_rect = pygame.Rect(self.pos[0] - offset[0] - (bar_width - self.size[0]) / 2,
-                                          self.pos[1] - offset[1] - 10, health_bar_width, bar_height)
+                                          self.pos[1] - offset[1] - 10 + 3, health_bar_width, bar_height)
 
         pygame.draw.rect(surface, (255, 0, 0), health_bar_rect)
         pygame.draw.rect(surface, (0, 255, 0), current_health_rect)
+
+    def render_name(self, surface, offset=(0, 0)):
+        render_name = pygame.font.Font(None, 16).render(self.name, True, (0, 0, 0))
+        text_rect = render_name.get_rect(center=(self.pos[0] + 5, int(self.pos[1]) - 15))
+        text_rect.x = int(text_rect.x - offset[0])
+        text_rect.y = int(text_rect.y - offset[1])
+        surface.blit(render_name, text_rect)
 
     def jump(self):
         if self.jumps:
@@ -125,9 +134,9 @@ class Player:
             self.jumps -= 1
 
     def take_damage(self, amount):
-        self.health -= amount
-        if self.health < 0:
-            self.health = 0
+        self.hp -= amount
+        if self.hp < 0:
+            self.hp = 0
 
     def switch_weapon(self, direction):
         current_index = self.weapons.index(self.current_weapon)

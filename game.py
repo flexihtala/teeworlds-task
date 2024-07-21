@@ -10,6 +10,7 @@ from scripts.player import Player
 from scripts.tilemap import Tilemap
 from scripts.tools.rpg import rpg_bullet
 from scripts.tools.minigun import minigun_bullet
+from main_menu.menu import MainMenu
 
 
 class Game:
@@ -50,12 +51,12 @@ class Game:
         self.player_info = {}
         self.players_data = {}
         self.players = {}
-
         self.receive_thread = threading.Thread(target=self.receive_data)
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
     def run(self):
+        self.player.name = MainMenu(self.screen).main_menu()
         while True:
             self.display.fill(BACKGROUND_COLOR)
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0])
@@ -123,6 +124,8 @@ class Game:
         self.player_info['mouse_pos'] = self.player.mouse_pos
         self.player_info['weapon_index'] = self.player.weapons.index(self.player.current_weapon)
         self.player_info['bullets'] = [bullet.serialize() for bullet in self.player.bullets]
+        self.player_info['hp'] = self.player.hp
+        self.player_info['nickname'] = self.player.name
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -151,6 +154,8 @@ class Game:
                             self.players[addr].current_weapon = self.players[addr].weapons[pdata['weapon_index']]
                             bullets = [self.deserialize_bullet(bullet) for bullet in pdata['bullets']]
                             self.players[addr].bullets = bullets
+                            self.players[addr].hp = pdata['hp']
+                            self.players[addr].name = pdata['nickname']
                             self.player.other_bullets = bullets
             except:
                 pass
@@ -174,3 +179,4 @@ class Game:
 
 if __name__ == "__main__":
     Game().run()
+

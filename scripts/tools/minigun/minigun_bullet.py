@@ -17,8 +17,9 @@ class Bullet:
         self.velocity = [direction[0] * speed, direction[1] * speed]
         self.size = (10, 10)
         self.is_exist = True
+        self.damage = 5
 
-    def update(self, tilemap, _):
+    def update(self, tilemap, _, is_enemy=False):
         # Move bullet
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]
@@ -26,6 +27,12 @@ class Bullet:
         length = math.sqrt((self.pos[0] - self.start_pos[0]) ** 2 + (self.pos[1] - self.start_pos[1]) ** 2)
         if length > self.range:
             self.is_exist = False
+
+        # получение урона
+        if is_enemy:
+            if self.rect().colliderect(self.game.player.rect()):
+                self.game.player.take_damage(self.damage)
+                self.is_exist = False
 
         # Check for collisions with tiles
         bullet_rect = self.rect()
