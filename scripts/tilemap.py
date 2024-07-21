@@ -4,7 +4,12 @@ NEIGHBOUR_OFFSETS = [(-1, 1), (0, 1), (1, 1),
                      (-1, 0), (0, 0), (1, 0),
                      (-1, -1), (0, -1), (1, -1)]
 
-PHYSICS_TILES = {'grass', 'left_grass', 'right_grass'}
+PHYSICS_TILES = {'grass',
+                 'left_grass',
+                 'right_grass',
+                 'left_ground_wall',
+                 'ground',
+                 'right_ground_wall'}
 
 
 class Tilemap:

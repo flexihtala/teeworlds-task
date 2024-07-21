@@ -24,6 +24,9 @@ class Editor:
             'grass': load_sprite('tiles/grass.png'),
             'left_grass': load_sprite('tiles/left_grass.png'),
             'right_grass': load_sprite('tiles/right_grass.png'),
+            'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
+            'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
+            'ground': load_sprite('tiles/ground.png'),
             'spawnpoint': load_sprite('tiles/spawnpoint.png')
         }
 
@@ -36,7 +39,7 @@ class Editor:
     def fill_buttons_list(self):
         i = 0
         for asset in self.assets.items():
-            self.buttons[asset[0]] = TileButton(475, i * 64 + 50, asset[1], 2)
+            self.buttons[asset[0]] = TileButton(475, i * 48 + 16, asset[1], 2)
             i += 1
 
     def draw_grid(self):

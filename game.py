@@ -32,6 +32,9 @@ class Game:
             'left_grass': load_sprite('tiles/left_grass.png'),
             'right_grass': load_sprite('tiles/right_grass.png'),
             'player': load_sprite('player.png'),
+            'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
+            'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
+            'ground': load_sprite('tiles/ground.png'),
             'spawnpoint': None
         }
 
