@@ -1,0 +1,112 @@
+import pygame
+import sys
+import json
+from scripts.utils import load_sprite
+from scripts.tile_button import TileButton
+from scripts.tilemap import Tilemap
+
+
+class Editor:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((800 + 300, 600 + 200))
+        self.display = pygame.Surface((400 + 150, 300 + 100))
+        pygame.display.set_caption('Level Editor')
+
+        self.scroll = [False, False]
+        self.offset = 0
+
+        self.rows = 20
+        self.cols = 50
+        self.tile_size = 16
+
+        self.assets = {
+            'grass': load_sprite('tiles/grass.png'),
+            'grass_left_edge': load_sprite('tiles/grass_left_edge.png'),
+            'grass_right_edge': load_sprite('tiles/grass_right_edge.png')
+        }
+
+        self.buttons = {}
+        self.fill_buttons_list()
+        self.current_tile = None
+
+        self.tilemap = Tilemap(self)
+
+    def fill_buttons_list(self):
+        i = 0
+        for asset in self.assets.items():
+            self.buttons[asset[0]] = TileButton(475, i * 64 + 50, asset[1], 2)
+            i += 1
+
+    def draw_grid(self):
+        for col in range(self.cols + 1):
+            pygame.draw.line(self.display, 'white',
+                             (col * self.tile_size - self.offset, 0),
+                             (col * self.tile_size - self.offset, 600))
+        for row in range(self.rows):
+            pygame.draw.line(self.display, 'white',
+                             (0, row * self.tile_size),
+                             (400, row * self.tile_size))
+
+    def place_tile(self):
+        mouse_pos = pygame.mouse.get_pos()
+        if mouse_pos[0] > 800 or mouse_pos[1] > 600 or self.current_tile is None:
+            return
+        tile_pos = ((mouse_pos[0] + 2 * self.offset) // 32, mouse_pos[1] // 32)
+        print(tile_pos)
+        tilemap_key = str(tile_pos[0]) + ';' + str(tile_pos[1])
+        self.tilemap.tilemap[tilemap_key] = {'type': self.current_tile,
+                                             'pos': tile_pos}
+
+    def run(self):
+        while True:
+            self.display.fill((14, 219, 248))
+            self.draw_grid()
+            self.tilemap.render(self.display, [self.offset, 0])
+            pygame.draw.rect(self.display, 'gray',
+                             pygame.Rect(0, 304, 400, 100))
+            pygame.draw.rect(self.display, 'gray',
+                             pygame.Rect(400, 0, 150, 450))
+            for button in self.buttons:
+                self.buttons[button].draw(self.display)
+                if self.buttons[button].clicked:
+                    self.current_tile = button
+
+            if self.current_tile is not None:
+                pygame.draw.rect(self.display, 'red', self.buttons[self.current_tile].rect, 1)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_a:
+                        self.scroll[0] = True
+                    if event.key == pygame.K_d:
+                        self.scroll[1] = True
+                    if event.key == pygame.K_s:
+                        print('Saving')
+                        with open('save.json', 'w', encoding='utf-8') as file:
+                            json.dump(self.tilemap.tilemap, file)
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_a:
+                        self.scroll[0] = False
+                    if event.key == pygame.K_d:
+                        self.scroll[1] = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        self.place_tile()
+
+            if self.scroll[0]:
+                self.offset = max(self.offset - 1, 0)
+            if self.scroll[1]:
+                self.offset = min(self.offset + 1, 400)
+            self.screen.blit(
+                pygame.transform.scale(self.display, self.screen.get_size()),
+                (0, 0))
+            pygame.display.update()
+
+
+if __name__ == '__main__':
+    Editor().run()

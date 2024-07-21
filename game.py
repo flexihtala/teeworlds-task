@@ -30,10 +30,14 @@ class Game:
 
         self.assets = {
             'grass': load_sprite('tiles/grass.png'),
+            'grass_left_edge': load_sprite('tiles/grass_left_edge.png'),
+            'grass_right_edge': load_sprite('tiles/grass_right_edge.png'),
             'player': load_sprite('player.png'),
         }
 
         self.tilemap = Tilemap(self, 16)
+        with open('save.json', 'r', encoding='utf-8') as file:
+            self.tilemap.tilemap = json.load(file)
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
