@@ -27,6 +27,9 @@ class Editor:
             'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
             'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
             'ground': load_sprite('tiles/ground.png'),
+            'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
+            'bottom_ground': load_sprite('tiles/bottom_ground.png'),
+            'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
             'spawnpoint': load_sprite('tiles/spawnpoint.png')
         }
 
@@ -38,9 +41,11 @@ class Editor:
 
     def fill_buttons_list(self):
         i = 0
+        j = 0
         for asset in self.assets.items():
-            self.buttons[asset[0]] = TileButton(475, i * 48 + 16, asset[1], 2)
+            self.buttons[asset[0]] = TileButton(425 + j, (i // 2) * 48 + 16, asset[1], 2)
             i += 1
+            j = 48 * (i % 2)
 
     def draw_grid(self):
         for col in range(self.cols + 1):

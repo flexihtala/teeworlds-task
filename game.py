@@ -36,6 +36,9 @@ class Game:
             'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
             'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
             'ground': load_sprite('tiles/ground.png'),
+            'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
+            'bottom_ground': load_sprite('tiles/bottom_ground.png'),
+            'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
             'spawnpoint': None
         }
 

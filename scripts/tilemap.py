@@ -9,7 +9,10 @@ PHYSICS_TILES = {'grass',
                  'right_grass',
                  'left_ground_wall',
                  'ground',
-                 'right_ground_wall'}
+                 'right_ground_wall',
+                 'left_bottom_ground',
+                 'bottom_ground',
+                 'right_bottom_ground'}
 
 
 class Tilemap:
