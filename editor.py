@@ -22,8 +22,9 @@ class Editor:
 
         self.assets = {
             'grass': load_sprite('tiles/grass.png'),
-            'grass_left_edge': load_sprite('tiles/grass_left_edge.png'),
-            'grass_right_edge': load_sprite('tiles/grass_right_edge.png')
+            'left_grass': load_sprite('tiles/left_grass.png'),
+            'right_grass': load_sprite('tiles/right_grass.png'),
+            'spawnpoint': load_sprite('tiles/spawnpoint.png')
         }
 
         self.buttons = {}

@@ -4,7 +4,7 @@ NEIGHBOUR_OFFSETS = [(-1, 1), (0, 1), (1, 1),
                      (-1, 0), (0, 0), (1, 0),
                      (-1, -1), (0, -1), (1, -1)]
 
-PHYSICS_TILES = {'grass'}
+PHYSICS_TILES = {'grass', 'left_grass', 'right_grass'}
 
 
 class Tilemap:
@@ -12,6 +12,12 @@ class Tilemap:
         self.game = game
         self.tile_size = tile_size
         self.tilemap = {}
+        self.spawnpoint_positions = list()
+
+    def find_spawnpoints(self):
+        for tile in self.tilemap.values():
+            if tile['type'] == 'spawnpoint':
+                self.spawnpoint_positions.append(tile['pos'])
 
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""
@@ -37,6 +43,8 @@ class Tilemap:
 
     def render(self, surface, offset=(0, 0)):
         for tile in self.tilemap.values():
+            if self.game.assets[tile['type']] is None:
+                continue
             tile_pos = (tile['pos'][0] * self.tile_size,
                         tile['pos'][1] * self.tile_size)
             surface.blit(self.game.assets[tile['type']], (tile_pos[0] - offset[0], tile_pos[1] - offset[1]))
