@@ -6,7 +6,7 @@ from scripts.utils import load_sprite
 
 
 class Bullet:
-    def __init__(self, game, pos, direction, is_bullet_flipped, angle, range1=200, speed=5):
+    def __init__(self, game, pos, direction, is_bullet_flipped, angle, damage, range1=200, speed=5):
         self.game = game
         self.direction = direction
         self.image = load_sprite('tools/rpg/bullet_rpg.png')
@@ -25,7 +25,7 @@ class Bullet:
         self.is_bullet_flipped = is_bullet_flipped
         self.explosion_group = pygame.sprite.Group()
         self.offset = (0, 0)
-        self.damage = 30
+        self.damage = damage
 
     def update(self, tilemap, offset=(0, 0), is_enemy=False):
         if self.exploded:
@@ -113,5 +113,6 @@ class Bullet:
             'is_bullet_flipped': self.is_bullet_flipped,
             'angle': self.angle,
             'is_exploded': self.exploded,
-            'bullet_type': 'rpg'
+            'bullet_type': 'rpg',
+            'damage': self.damage,
         }

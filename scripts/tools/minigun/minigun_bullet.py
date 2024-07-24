@@ -4,7 +4,7 @@ from scripts.utils import load_sprite
 
 
 class Bullet:
-    def __init__(self, game, pos, direction, range1=200, speed=10):
+    def __init__(self, game, pos, direction, damage, range1=200, speed=10):
         self.game = game
         self.direction = direction
         self.image = load_sprite('tools/minigun/minigun_bullet.png')
@@ -17,7 +17,7 @@ class Bullet:
         self.velocity = [direction[0] * speed, direction[1] * speed]
         self.size = (10, 10)
         self.is_exist = True
-        self.damage = 5
+        self.damage = damage
 
     def update(self, tilemap, _, is_enemy=False):
         # Move bullet
@@ -57,5 +57,6 @@ class Bullet:
             'pos': self.pos,
             'direction': self.direction,
             'bullet_type': 'minigun',
-            'is_exist': self.is_exist
+            'is_exist': self.is_exist,
+            'damage': self.damage,
         }

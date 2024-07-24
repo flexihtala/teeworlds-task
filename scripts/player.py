@@ -32,6 +32,7 @@ class Player:
         self.bullets = []
         self.other_bullets = []
         self.immortality_time = 120
+        self.is_immortal = False
 
     def update(self, tilemap, movement=(0, 0)):
         self.immortality_time -= 1
@@ -140,7 +141,7 @@ class Player:
             self.jumps -= 1
 
     def take_damage(self, amount):
-        if self.immortality_time > 0:
+        if self.immortality_time > 0 or self.is_immortal:
             return
         self.hp -= amount
         if self.hp < 1:

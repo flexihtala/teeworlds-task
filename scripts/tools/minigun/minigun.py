@@ -21,11 +21,12 @@ class Minigun:
         self.angle = 0
         # Сила отталкивания
         self.force = 0.1
+        self.damage = 5
 
     def shoot(self, direction):
         if self.ticks > 5:
             self.ticks = 0
-            bullet = Bullet(self.game, self.player.rect().center, direction)
+            bullet = Bullet(self.game, self.player.rect().center, direction, self.damage)
             self.give_player_impulse()
             # todo сделать вылет пули из дула, а не из центра игрока(не обязательно, но желательно)
             self.player.bullets.append(bullet)
