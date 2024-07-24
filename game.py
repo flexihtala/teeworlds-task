@@ -5,6 +5,8 @@ import json
 import threading
 import math
 import random
+
+from main_menu.input_box import InputBox
 from scripts.settings import *
 from scripts.utils import load_sprite
 from scripts.player import Player
@@ -12,6 +14,7 @@ from scripts.tilemap import Tilemap
 from scripts.tools.rpg import rpg_bullet
 from scripts.tools.minigun import minigun_bullet
 from main_menu.menu import MainMenu
+from scripts.cheat_codes import cheat_cods
 
 
 class Game:
@@ -70,6 +73,15 @@ class Game:
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
+        self.is_cheat_menu_active = False
+        self.input_box = InputBox(5, 5, 300, 48, pygame.Color('black'),
+                                  pygame.Color('darkslategrey'), self.screen)
+        self.text_surface = (pygame.font.Font(None, 48).
+                             render("Код неверный",
+                                    True, (0, 0, 0)))
+        self.text_rect = self.text_surface.get_rect(center=(WIDTH / 2, 100))
+        self.is_warning_active = False
+
     def run(self):
         self.player.name = MainMenu(self.screen).main_menu()
         while True:
@@ -88,44 +100,77 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_a:
-                        self.movement[0] = True
-                    if event.key == pygame.K_d:
-                        self.movement[1] = True
-                    if event.key == pygame.K_SPACE:
-                        self.player.jump()
+                if not self.is_cheat_menu_active:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == 96:
+                            self.is_cheat_menu_active = True
+                            self.input_box.text = ""
+                        if event.key == pygame.K_a:
+                            self.movement[0] = True
+                        if event.key == pygame.K_d:
+                            self.movement[1] = True
+                        if event.key == pygame.K_SPACE:
+                            self.player.jump()
 
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_a:
-                        self.movement[0] = False
-                        self.player.velocity[0] = 0
-                    if event.key == pygame.K_d:
-                        self.movement[1] = False
-                        self.player.velocity[0] = 0
+                    if event.type == pygame.KEYUP:
+                        if event.key == pygame.K_a:
+                            self.movement[0] = False
+                            self.player.velocity[0] = 0
+                        if event.key == pygame.K_d:
+                            self.movement[1] = False
+                            self.player.velocity[0] = 0
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    world_mouse_pos = (mouse_pos[0], mouse_pos[1])
-                    direction = (world_mouse_pos[0] - WIDTH / 2, world_mouse_pos[1] - HEIGHT / 2)
-                    length = math.sqrt(direction[0] * direction[0] + direction[1] * direction[1])
-                    direction = (direction[0] / length, direction[1] / length)
-                    if event.button == 3:
-                        self.player.hook.shoot(direction)
-                    if event.button == 1:
-                        self.player.current_weapon.shoot(direction)
-                        self.player.minigun.is_shooting = True
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if event.button == 1:
-                        self.player.minigun.is_shooting = False
-                elif event.type == pygame.MOUSEWHEEL:
-                    if event.y > 0:
-                        self.player.switch_weapon(1)
-                    elif event.y < 0:
-                        self.player.switch_weapon(-1)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        world_mouse_pos = (mouse_pos[0], mouse_pos[1])
+                        direction = (world_mouse_pos[0] - WIDTH / 2, world_mouse_pos[1] - HEIGHT / 2)
+                        length = math.sqrt(direction[0] * direction[0] + direction[1] * direction[1])
+                        direction = (direction[0] / length, direction[1] / length)
+                        if event.button == 3:
+                            self.player.hook.shoot(direction)
+                        if event.button == 1:
+                            self.player.current_weapon.shoot(direction)
+                            self.player.minigun.is_shooting = True
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        if event.button == 1:
+                            self.player.minigun.is_shooting = False
+                    elif event.type == pygame.MOUSEWHEEL:
+                        if event.y > 0:
+                            self.player.switch_weapon(1)
+                        elif event.y < 0:
+                            self.player.switch_weapon(-1)
+
+                else:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == 96:
+                            self.is_cheat_menu_active = False
+                            self.is_warning_active = False
+                            self.input_box.text = ''
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN or self.input_box.is_enter_pressed:
+                        input_text = self.input_box.text
+                        if input_text not in cheat_cods:
+                            self.is_warning_active = True
+                        else:
+                            self.is_cheat_menu_active = False
+                            code = cheat_cods[input_text]
+                            self.is_warning_active = False
+                            if code == "immortality":
+                                self.player.is_immortal = True
+                            elif code == "full_hp":
+                                self.player.hp = 100
+                            elif code == "damage_up":
+                                self.player.current_weapon.damage *= 2
+                        self.input_box.is_enter_pressed = False
+                        self.input_box.text = ""
+                self.input_box.handle_event(event)
+            self.input_box.update()
 
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
+            if self.is_cheat_menu_active:
+                self.input_box.draw()
+            if self.is_warning_active:
+                self.screen.blit(self.text_surface, self.text_rect)
             pygame.display.update()
             self.clock.tick(FPS)
 
@@ -178,14 +223,15 @@ class Game:
     def deserialize_bullet(self, bullet_info):
         pos = bullet_info['pos']
         direction = bullet_info['direction']
+        damage = bullet_info['damage']
         if bullet_info['bullet_type'] == 'rpg':
             is_bullet_flipped = bullet_info['is_bullet_flipped']
             angle = bullet_info['angle']
-            bullet = rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle)
+            bullet = rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle, damage)
             bullet.exploded = bullet_info['is_exploded']
             return bullet
         elif bullet_info['bullet_type'] == 'minigun':
-            bullet = minigun_bullet.Bullet(self, pos, direction)
+            bullet = minigun_bullet.Bullet(self, pos, direction, damage)
             bullet.is_exist = bullet_info['is_exist']
             return bullet
 
