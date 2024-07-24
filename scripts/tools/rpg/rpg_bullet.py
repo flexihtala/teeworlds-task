@@ -33,7 +33,6 @@ class Bullet:
         bullet_rect = self.rect()
         if is_enemy:
             if bullet_rect.colliderect(self.game.player.rect()):
-                self.exploded = True
                 self.explode(True)
                 return
         self.offset = offset
@@ -45,7 +44,10 @@ class Bullet:
         length = math.sqrt((self.pos[0] - self.start_pos[0]) ** 2 + (self.pos[1] - self.start_pos[1]) ** 2)
         if length > self.range:
             self.is_exist = False
-
+        for player in self.game.players.values():
+            if bullet_rect.colliderect(player.rect()):
+                self.explode(False)
+                return
         # Check for collisions with tiles
         for rect in tilemap.physics_rects_around(self.pos):
             if bullet_rect.colliderect(rect):
@@ -61,6 +63,8 @@ class Bullet:
             if self.distance_to(player.rect().center) <= self.exploding_radius:
                 self.apply_explosion_force(player)
         if self.distance_to((self.game.player_info['x'], self.game.player_info['y'])) <= self.exploding_radius:
+            if self.game.player.immortality_time > 0:
+                pass
             self.apply_explosion_force(self.game.player)
             if is_enemy:
                 self.game.player.take_damage(self.damage)

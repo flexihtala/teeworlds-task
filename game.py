@@ -47,8 +47,8 @@ class Game:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
 
-        spawnpoint_pos = self.tilemap.spawnpoint_positions[random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
-        start_pos = [spawnpoint_pos[0] * 16, spawnpoint_pos[1] * 16]
+        self.spawnpoint_pos = self.tilemap.spawnpoint_positions[random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
+        start_pos = [self.spawnpoint_pos[0] * 16, self.spawnpoint_pos[1] * 16]
         self.player = Player(self, start_pos, (10, 16))
 
         self.scroll = [0, 0]
@@ -185,7 +185,9 @@ class Game:
             bullet.exploded = bullet_info['is_exploded']
             return bullet
         elif bullet_info['bullet_type'] == 'minigun':
-            return minigun_bullet.Bullet(self, pos, direction)
+            bullet = minigun_bullet.Bullet(self, pos, direction)
+            bullet.is_exist = bullet_info['is_exist']
+            return bullet
 
     def render_players(self, render_scroll):
         for player in self.players.values():

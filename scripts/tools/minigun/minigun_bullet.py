@@ -33,6 +33,10 @@ class Bullet:
             if self.rect().colliderect(self.game.player.rect()):
                 self.game.player.take_damage(self.damage)
                 self.is_exist = False
+        bullet_rect = pygame.Rect(self.pos[0], self.pos[1], *self.image.get_rect().size)
+        for player in self.game.players.values():
+            if bullet_rect.colliderect(player.rect()):
+                self.is_exist = False
 
         # Check for collisions with tiles
         bullet_rect = self.rect()
@@ -52,5 +56,6 @@ class Bullet:
         return {
             'pos': self.pos,
             'direction': self.direction,
-            'bullet_type': 'minigun'
+            'bullet_type': 'minigun',
+            'is_exist': self.is_exist
         }

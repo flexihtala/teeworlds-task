@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from scripts.settings import WIDTH
 from scripts.tools.rpg.rpg import Rpg
@@ -29,8 +31,10 @@ class Player:
         self.hook = Hook(self.game, self)
         self.bullets = []
         self.other_bullets = []
+        self.immortality_time = 120
 
     def update(self, tilemap, movement=(0, 0)):
+        self.immortality_time -= 1
         self.mouse_pos = pygame.mouse.get_pos()
         self.bullets = [bullet for bullet in self.bullets if bullet.is_exist]
         self.current_weapon.update(self.game.tilemap, self.game.render_scroll)
@@ -93,6 +97,8 @@ class Player:
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
+        if self.hp < 1:
+            return
         image = self.game.assets['player']
         if self.direction == 'right':
             image = pygame.transform.flip(image, True, False)
@@ -134,11 +140,21 @@ class Player:
             self.jumps -= 1
 
     def take_damage(self, amount):
+        if self.immortality_time > 0:
+            return
         self.hp -= amount
-        if self.hp < 0:
+        if self.hp < 1:
             self.hp = 0
+            self.die()
 
     def switch_weapon(self, direction):
         current_index = self.weapons.index(self.current_weapon)
         new_index = (current_index + direction) % len(self.weapons)
         self.current_weapon = self.weapons[new_index]
+
+    def die(self):
+        spawn_point = self.game.tilemap.spawnpoint_positions[random.randint(0, len(self.game.tilemap.spawnpoint_positions)) - 1]
+        self.pos = [spawn_point[0] * 16, spawn_point[1] * 16]
+        self.hp = self.max_hp
+        self.velocity = [0, 0]
+        self.immortality_time = 120
