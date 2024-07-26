@@ -18,6 +18,8 @@ class Bullet:
         self.size = (10, 10)
         self.is_exist = True
         self.damage = damage
+        self.is_damaged = False
+        self.damaged_player = -1
 
     def update(self, tilemap, _, is_enemy=False):
         # Move bullet
@@ -28,15 +30,22 @@ class Bullet:
         if length > self.range:
             self.is_exist = False
 
+        bullet_rect = pygame.Rect(self.pos[0], self.pos[1], *self.image.get_rect().size)
         # получение урона
         if is_enemy:
-            if self.rect().colliderect(self.game.player.rect()):
+            if self.game.player.id == self.damaged_player:
                 self.game.player.take_damage(self.damage)
+
+        else:
+            if self.is_damaged:
+                self.damaged_player = -1
                 self.is_exist = False
-        bullet_rect = pygame.Rect(self.pos[0], self.pos[1], *self.image.get_rect().size)
-        for player in self.game.players.values():
-            if bullet_rect.colliderect(player.rect()):
-                self.is_exist = False
+                return
+
+            for player in self.game.players.values():
+                if bullet_rect.colliderect(player.rect()):
+                    self.damaged_player = player.id
+                    self.is_damaged = True
 
         # Check for collisions with tiles
         bullet_rect = self.rect()
@@ -59,4 +68,5 @@ class Bullet:
             'bullet_type': 'minigun',
             'is_exist': self.is_exist,
             'damage': self.damage,
+            'damaged_player': self.damaged_player,
         }

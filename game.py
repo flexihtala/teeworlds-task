@@ -186,6 +186,7 @@ class Game:
         self.player_info['bullets'] = [bullet.serialize() for bullet in self.player.bullets]
         self.player_info['hp'] = self.player.hp
         self.player_info['nickname'] = self.player.name
+        self.player_info['id'] = self.player.id
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -216,6 +217,7 @@ class Game:
                             self.players[addr].bullets = bullets
                             self.players[addr].hp = pdata['hp']
                             self.players[addr].name = pdata['nickname']
+                            self.players[addr].id = pdata['id']
                             self.player.other_bullets = bullets
             except:
                 pass
@@ -229,10 +231,12 @@ class Game:
             angle = bullet_info['angle']
             bullet = rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle, damage)
             bullet.exploded = bullet_info['is_exploded']
+            bullet.damaged_players = bullet_info['damaged_players']
             return bullet
         elif bullet_info['bullet_type'] == 'minigun':
             bullet = minigun_bullet.Bullet(self, pos, direction, damage)
             bullet.is_exist = bullet_info['is_exist']
+            bullet.damaged_player = bullet_info['damaged_player']
             return bullet
 
     def render_players(self, render_scroll):

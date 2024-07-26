@@ -26,15 +26,30 @@ class Bullet:
         self.explosion_group = pygame.sprite.Group()
         self.offset = (0, 0)
         self.damage = damage
+        self.is_damaged = False
+        self.damaged_players = []
 
     def update(self, tilemap, offset=(0, 0), is_enemy=False):
         if self.exploded:
             return
         bullet_rect = self.rect()
         if is_enemy:
-            if bullet_rect.colliderect(self.game.player.rect()):
-                self.explode(True)
+            if self.game.player.id in self.damaged_players:
+                self.game.player.take_damage(self.damage)
+                self.apply_explosion_force(self.game.player)
+                self.explode()
+
+        else:
+            if self.is_damaged:
+                self.damaged_players = []
+                self.explode()
                 return
+
+            for player in self.game.players.values():
+                if bullet_rect.colliderect(player.rect()):
+                    self.damaged_players.append(player.id)
+                    self.is_damaged = True
+
         self.offset = offset
 
         # Move bullet
@@ -44,30 +59,24 @@ class Bullet:
         length = math.sqrt((self.pos[0] - self.start_pos[0]) ** 2 + (self.pos[1] - self.start_pos[1]) ** 2)
         if length > self.range:
             self.is_exist = False
-        for player in self.game.players.values():
-            if bullet_rect.colliderect(player.rect()):
-                self.explode(False)
-                return
         # Check for collisions with tiles
         for rect in tilemap.physics_rects_around(self.pos):
             if bullet_rect.colliderect(rect):
-                self.explode(is_enemy)
+                if is_enemy:
+                    self.explode()
+                    return
+                for player in self.game.players.values():
+                    if self.distance_to(player.rect().center) <= self.exploding_radius:
+                        self.damaged_players.append(player.id)
+                if self.distance_to(self.game.player.rect().center) <= self.exploding_radius:
+                    self.apply_explosion_force(self.game.player)
+                self.is_damaged = True
                 return
 
-    def explode(self, is_enemy):
+    def explode(self):
         self.exploded = True
         explosion = Explosion(self.pos[0] - self.offset[0], self.pos[1] - self.offset[1], self)
         self.explosion_group.add(explosion)
-        # Check for players within the explosion radius
-        for player in self.game.players.values():
-            if self.distance_to(player.rect().center) <= self.exploding_radius:
-                self.apply_explosion_force(player)
-        if self.distance_to((self.game.player_info['x'], self.game.player_info['y'])) <= self.exploding_radius:
-            if self.game.player.immortality_time > 0:
-                pass
-            self.apply_explosion_force(self.game.player)
-            if is_enemy:
-                self.game.player.take_damage(self.damage)
 
     def apply_explosion_force(self, player):
         dx = player.rect().center[0] - self.pos[0]
@@ -115,4 +124,5 @@ class Bullet:
             'is_exploded': self.exploded,
             'bullet_type': 'rpg',
             'damage': self.damage,
+            'damaged_players': self.damaged_players,
         }
