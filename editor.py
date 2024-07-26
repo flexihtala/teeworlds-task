@@ -30,7 +30,8 @@ class Editor:
             'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
-            'spawnpoint': load_sprite('tiles/spawnpoint.png')
+            'spawnpoint': load_sprite('tiles/spawnpoint.png'),
+            'heal': load_sprite('tiles/heal.png')
         }
 
         self.buttons = {}
@@ -38,6 +39,9 @@ class Editor:
         self.current_tile = None
 
         self.tilemap = Tilemap(self)
+
+        self.is_left_hold = False
+        self.is_right_hold = False
 
     def fill_buttons_list(self):
         i = 0
@@ -57,15 +61,18 @@ class Editor:
                              (0, row * self.tile_size),
                              (400, row * self.tile_size))
 
-    def place_tile(self):
+    def place_tile(self, remove_tile=False):
         mouse_pos = pygame.mouse.get_pos()
         if mouse_pos[0] > 800 or mouse_pos[1] > 600 or self.current_tile is None:
             return
         tile_pos = ((mouse_pos[0] + 2 * self.offset) // 32, mouse_pos[1] // 32)
-        print(tile_pos)
         tilemap_key = str(tile_pos[0]) + ';' + str(tile_pos[1])
-        self.tilemap.tilemap[tilemap_key] = {'type': self.current_tile,
-                                             'pos': tile_pos}
+        if not remove_tile:
+            self.tilemap.tilemap[tilemap_key] = {'type': self.current_tile,
+                                                 'pos': tile_pos}
+        else:
+            self.tilemap.tilemap.pop(tilemap_key, None)
+
 
     def run(self):
         while True:
@@ -105,7 +112,19 @@ class Editor:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        self.place_tile()
+                        self.is_left_hold = True
+                    if event.button == 3:
+                        self.is_right_hold = True
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        self.is_left_hold = False
+                    if event.button == 3:
+                        self.is_right_hold = False
+
+            if self.is_left_hold:
+                self.place_tile()
+            if self.is_right_hold:
+                self.place_tile(remove_tile=True)
 
             if self.scroll[0]:
                 self.offset = max(self.offset - 1, 0)

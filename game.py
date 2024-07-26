@@ -42,7 +42,8 @@ class Game:
             'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
-            'spawnpoint': None
+            'spawnpoint': None,
+            'heal': load_sprite('tiles/heal.png')
         }
 
         self.tilemap = Tilemap(self, 16)

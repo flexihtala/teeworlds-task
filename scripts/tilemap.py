@@ -21,11 +21,17 @@ class Tilemap:
         self.tile_size = tile_size
         self.tilemap = {}
         self.spawnpoint_positions = list()
+        self.heal_positions = list()
 
     def find_spawnpoints(self):
         for tile in self.tilemap.values():
             if tile['type'] == 'spawnpoint':
                 self.spawnpoint_positions.append(tile['pos'])
+
+    def find_heal_positions(self):
+        for tile in self.tilemap.values():
+            if tile['type'] == 'heal':
+                self.heal_positions.append(tile['pos'])
 
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""
