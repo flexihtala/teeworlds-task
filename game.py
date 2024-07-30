@@ -231,6 +231,7 @@ class Game:
             is_bullet_flipped = bullet_info['is_bullet_flipped']
             angle = bullet_info['angle']
             bullet = rpg_bullet.Bullet(self, pos, direction, is_bullet_flipped, angle, damage)
+            bullet.is_damaged = bullet_info['is_damaged']
             bullet.exploded = bullet_info['is_exploded']
             bullet.damaged_players = bullet_info['damaged_players']
             return bullet

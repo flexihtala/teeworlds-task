@@ -13,7 +13,7 @@ class Hook:
         self.is_hooked = False
         self.max_length = 200
         self.is_rope_torn = True
-        self.tension_coefficient = 0.1  # коэффициент натяжения (увеличен для большей силы притяжения)
+        self.tension_coefficient = 0.1
 
     def shoot(self, direction):
         if self.is_rope_torn:
@@ -58,15 +58,13 @@ class Hook:
             return
 
         if distance > self.length:
-            force = (distance - self.length) * self.tension_coefficient  # изменен коэффициент натяжения
+            force = (distance - self.length) * self.tension_coefficient
             force_x = force * (dx / distance)
             force_y = force * (dy / distance)
 
-            # Применяем силу натяжения
             self.player.velocity[0] += force_x
             self.player.velocity[1] += force_y
         else:
-            # Обновление длины крюка
             self.length = distance
 
     def render(self, surface, scroll):

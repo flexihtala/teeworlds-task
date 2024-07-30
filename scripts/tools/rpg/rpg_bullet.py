@@ -52,7 +52,6 @@ class Bullet:
 
         self.offset = offset
 
-        # Move bullet
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]
 
@@ -60,18 +59,19 @@ class Bullet:
         if length > self.range:
             self.is_exist = False
         # Check for collisions with tiles
-        for rect in tilemap.physics_rects_around(self.pos):
-            if bullet_rect.colliderect(rect):
-                if is_enemy:
-                    self.explode()
+        if not self.is_damaged:
+            for rect in tilemap.physics_rects_around(self.pos):
+                if bullet_rect.colliderect(rect):
+                    if is_enemy:
+                        self.explode()
+                        return
+                    for player in self.game.players.values():
+                        if self.distance_to(player.rect().center) <= self.exploding_radius:
+                            self.damaged_players.append(player.id)
+                    if self.distance_to(self.game.player.rect().center) <= self.exploding_radius:
+                        self.apply_explosion_force(self.game.player)
+                    self.is_damaged = True
                     return
-                for player in self.game.players.values():
-                    if self.distance_to(player.rect().center) <= self.exploding_radius:
-                        self.damaged_players.append(player.id)
-                if self.distance_to(self.game.player.rect().center) <= self.exploding_radius:
-                    self.apply_explosion_force(self.game.player)
-                self.is_damaged = True
-                return
 
     def explode(self):
         self.exploded = True
@@ -79,6 +79,8 @@ class Bullet:
         self.explosion_group.add(explosion)
 
     def apply_explosion_force(self, player):
+        if player.immortality_time > 0:
+            return
         dx = player.rect().center[0] - self.pos[0]
         dy = player.rect().center[1] - self.pos[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -86,7 +88,7 @@ class Bullet:
         if distance < 1:
             distance = 2
 
-        force = 10 / distance  # Explosion force decreases with distance
+        force = 10 / distance
         if force < 2:
             force = 2
         angle = math.atan2(dy, dx)
