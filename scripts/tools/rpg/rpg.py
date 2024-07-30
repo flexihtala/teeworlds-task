@@ -25,7 +25,6 @@ class Rpg:
         if self.ticks > 60:
             self.ticks = 0
             bullet = Bullet(self.game, self.player.rect().center, direction, self.is_bullet_flipped, self.angle, self.damage)
-            # todo сделать вылет пули из дула, а не из центра игрока(не обязательно, но желательно)
             self.player.bullets.append(bullet)
 
     def update(self, tilemap, offset=(0, 0)):

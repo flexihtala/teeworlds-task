@@ -59,7 +59,6 @@ class Bullet:
         length = math.sqrt((self.pos[0] - self.start_pos[0]) ** 2 + (self.pos[1] - self.start_pos[1]) ** 2)
         if length > self.range:
             self.is_exist = False
-        # Check for collisions with tiles
         if not self.is_damaged:
             for rect in tilemap.physics_rects_around(self.pos):
                 if bullet_rect.colliderect(rect):
