@@ -35,7 +35,6 @@ class Player:
         self.is_immortal = False
         # todo норм айди
         self.id = random.randint(1, 10000)
-        print(self.id)
 
     def update(self, tilemap, movement=(0, 0)):
         self.immortality_time -= 1

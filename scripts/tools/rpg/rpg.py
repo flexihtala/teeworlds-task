@@ -10,7 +10,6 @@ class Rpg:
     def __init__(self, game, player):
         self.game = game
         self.player = player
-        # todo добавить удаление пуль, которые уже взорвались/исчезли
         self.image = load_sprite('tools/rpg/rpg.png')
         self.scale_mult = 10
         # координаты ключевой точки относительно левого верхнего угла картинки

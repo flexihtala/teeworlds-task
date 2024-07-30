@@ -33,10 +33,11 @@ class Bullet:
         if self.exploded:
             return
         bullet_rect = self.rect()
-        if is_enemy:
+        if is_enemy and not self.is_damaged:
             if self.game.player.id in self.damaged_players:
                 self.game.player.take_damage(self.damage)
                 self.apply_explosion_force(self.game.player)
+                self.is_damaged = True
                 self.explode()
 
         else:
@@ -61,7 +62,8 @@ class Bullet:
             self.is_exist = False
         # Check for collisions with tiles
         for rect in tilemap.physics_rects_around(self.pos):
-            if bullet_rect.colliderect(rect):
+            if bullet_rect.colliderect(rect) and not self.is_damaged:
+                self.is_damaged = True
                 if is_enemy:
                     self.explode()
                     return
@@ -70,7 +72,6 @@ class Bullet:
                         self.damaged_players.append(player.id)
                 if self.distance_to(self.game.player.rect().center) <= self.exploding_radius:
                     self.apply_explosion_force(self.game.player)
-                self.is_damaged = True
                 return
 
     def explode(self):
@@ -89,9 +90,9 @@ class Bullet:
         force = 10 / distance  # Explosion force decreases with distance
         if force < 2:
             force = 2
-        angle = math.atan2(dy, dx)
+        angle = math.atan2(dy, -dx)
 
-        player.velocity[0] += force * math.cos(angle)
+        player.velocity[0] -= force * math.cos(angle)
         player.velocity[1] += force * math.sin(angle)
 
     def distance_to(self, point):

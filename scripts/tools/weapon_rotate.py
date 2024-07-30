@@ -2,8 +2,7 @@ import pygame
 
 
 def get_rotated_parameters(image, pos, origin_pos, angle):
-    """Сложный страшный метод, писал 2 часа, добивал при помощи китайца со стаковерфлоу,
-         высчитывает координаты повернутой фигуры image на угол angle
+    """  Высчитывает координаты повернутой фигуры image на угол angle
          pos - финальная позиция на экране,
          origin_pos - позиция точки поворота относительно верхнего левого угла исходной картинки"""
     image_rect = image.get_rect(topleft=(pos[0] - origin_pos[0], pos[1] - origin_pos[1]))
