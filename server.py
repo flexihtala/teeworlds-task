@@ -5,7 +5,7 @@ import json
 
 class GameServer:
     def __init__(self):
-        self.host = 'localhost'
+        self.host = '192.168.1.125'
         self.port = 5555
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clients = []
