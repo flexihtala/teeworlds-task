@@ -1,7 +1,7 @@
 import pygame
 import sys
 import socket
-import json
+import pickle
 import threading
 import math
 import random
@@ -47,19 +47,15 @@ class Game:
         }
 
         self.tilemap = Tilemap(self, 16)
-        with open('save.json', 'r', encoding='utf-8') as file:
-            self.tilemap.tilemap = json.load(file)
+        with open('save.json', 'rb') as file:
+            self.tilemap.tilemap = pickle.load(file)
         self.tilemap.find_spawnpoints()
-
-        self.spawnpoint_pos = self.tilemap.spawnpoint_positions[random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
-        start_pos = [self.spawnpoint_pos[0] * 16, self.spawnpoint_pos[1] * 16]
-        self.player = Player(self, start_pos, (10, 16))
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
         self.camera_speed = 30
 
-        self.host = '192.168.1.125'
+        self.host = 'localhost'
         self.port = 5555
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect((self.host, self.port))
@@ -67,12 +63,21 @@ class Game:
         self.address = str(self.socket_name[0]) + ":" + str(
             self.socket_name[1])
 
+        self.send_map()
+        self.get_map()
+
         self.player_info = {}
         self.players_data = {}
         self.players = {}
         self.receive_thread = threading.Thread(target=self.receive_data)
         self.receive_thread.daemon = True
         self.receive_thread.start()
+
+
+        spawnpoint_pos = self.tilemap.spawnpoint_positions[
+            random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
+        start_pos = [spawnpoint_pos[0] * 16, spawnpoint_pos[1] * 16]
+        self.player = Player(self, start_pos, (10, 16))
 
         self.is_cheat_menu_active = False
         self.input_box = InputBox(5, 5, 300, 48, pygame.Color('black'),
@@ -175,6 +180,13 @@ class Game:
             pygame.display.update()
             self.clock.tick(FPS)
 
+    def send_map(self):
+        try:
+            self.client_socket.sendall(pickle.dumps({'map': self.tilemap.tilemap,
+                                                     'spawnpoints': self.tilemap.spawnpoint_positions}))
+        except Exception as e:
+            print(f"Ошибка при отправлении карты: {e}")
+
     def send_player_info(self):
         self.player_info['x'] = self.player.pos[0]
         self.player_info['y'] = self.player.pos[1]
@@ -189,16 +201,30 @@ class Game:
         self.player_info['nickname'] = self.player.name
         self.player_info['id'] = self.player.id
         try:
-            self.client_socket.sendall(json.dumps(self.player_info).encode())
+            self.client_socket.sendall(pickle.dumps(self.player_info))
         except Exception as e:
             print(f"Ошибка при отправлении информации: {e}")
+
+    def get_map(self):
+        while True:
+            try:
+                data = pickle.loads(self.client_socket.recv(1024))
+                print(data)
+                if 'map' in data:
+                    if data['map'] is None:
+                        break
+                    self.tilemap.tilemap = data['map']
+                    self.tilemap.spawnpoint_positions = data['spawnpoints']
+                    break
+            except Exception as e:
+                print(f'Произошла ошибка при получении карты {e}')
 
     def receive_data(self):
         while True:
             try:
-                data = self.client_socket.recv(1024).decode()
+                data = self.client_socket.recv(1024)
                 if data:
-                    self.players_data = json.loads(data)
+                    self.players_data = pickle.loads(data)
                     self.players_data.pop(self.address)
                     current_addresses = set(self.players_data.keys())
                     for addr in self.players.keys():
@@ -220,6 +246,8 @@ class Game:
                             self.players[addr].name = pdata['nickname']
                             self.players[addr].id = pdata['id']
                             self.player.other_bullets = bullets
+                            self.tilemap.tilemap = pdata['map']
+                            self.tilemap.spawnpoint_positions = pdata['spawnpoints']
             except:
                 pass
 

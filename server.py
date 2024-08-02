@@ -1,15 +1,17 @@
 import socket
 import threading
-import json
+import pickle
 
 
 class GameServer:
     def __init__(self):
-        self.host = '192.168.1.125'
+        self.host = 'localhost'
         self.port = 5555
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clients = []
         self.players = {}
+        self.map = {}
+        self.spawnpoints = []
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
         print('Сервер запущен, ожидание подключения')
@@ -17,16 +19,23 @@ class GameServer:
     def handle_client(self, conn, addr):
         try:
             while True:
-                data = conn.recv(1024).decode()
+                data = pickle.loads(conn.recv(1024))
                 if not data:
                     break
-                player_data = json.loads(data)
+                if 'map' in data:
+                    print('загрузил карту')
+                    if not self.map:
+                        self.map = data['map']
+                        self.spawnpoints = data['spawnpoints']
+                    continue
+                player_data = data
                 self.players[addr] = player_data
-                print(self.players)
+                self.players[addr]['map'] = self.map
+                self.players[addr]['spawnpoints'] = self.spawnpoints
                 for client in self.clients:
-                    client.sendall(json.dumps(self.players).encode('utf-8'))
+                    client.sendall(pickle.dumps(self.players))
         except Exception as e:
-            print(e)
+            raise e
         finally:
             conn.close()
             self.clients.remove(conn)
@@ -40,6 +49,11 @@ class GameServer:
                 address = str(addr[0]) + ":" + str(addr[1])
                 print(f'Подключен к адресу {addr}')
                 self.clients.append(conn)
+                if self.map:
+                    conn.sendall(pickle.dumps({'map': self.map,
+                                               'spawnpoints': self.spawnpoints}))
+                else:
+                    conn.sendall(pickle.dumps({'map': None}))
                 threading.Thread(target=self.handle_client,
                                  args=(conn, address)).start()
         except Exception as e:

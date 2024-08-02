@@ -1,6 +1,6 @@
 import pygame
 import sys
-import json
+import pickle
 from scripts.utils import load_sprite
 from scripts.tile_button import TileButton
 from scripts.tilemap import Tilemap
@@ -102,8 +102,8 @@ class Editor:
                         self.scroll[1] = True
                     if event.key == pygame.K_s:
                         print('Saving')
-                        with open('save.json', 'w', encoding='utf-8') as file:
-                            json.dump(self.tilemap.tilemap, file)
+                        with open('save.json', 'wb') as file:
+                            pickle.dump(self.tilemap.tilemap, file)
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.scroll[0] = False
