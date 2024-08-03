@@ -22,6 +22,7 @@ class Tilemap:
         self.tilemap = {}
         self.spawnpoint_positions = list()
         self.heal_positions = list()
+        self.random_potion_positions = list()
 
     def find_spawnpoints(self):
         for tile in self.tilemap.values():
@@ -32,6 +33,11 @@ class Tilemap:
         for tile in self.tilemap.values():
             if tile['type'] == 'heal':
                 self.heal_positions.append(tile['pos'])
+
+    def find_random_potion_positions(self):
+        for tile in self.tilemap.values():
+            if tile['type'] == 'random_potion':
+                self.random_potion_positions.append(tile['pos'])
 
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""

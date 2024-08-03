@@ -31,7 +31,8 @@ class Editor:
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
             'spawnpoint': load_sprite('tiles/spawnpoint.png'),
-            'heal': load_sprite('tiles/heal.png')
+            'heal': load_sprite('tiles/heal.png'),
+            'random_potion': load_sprite('tiles/random_potion.png')
         }
 
         self.buttons = {}

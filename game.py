@@ -44,7 +44,8 @@ class Game:
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
             'spawnpoint': None,
-            'heal': load_sprite('tiles/heal.png')
+            'heal': load_sprite('tiles/heal.png'),
+            'random_potion': load_sprite('tiles/random_potion.png')
         }
 
         self.tilemap = Tilemap(self, 16)
