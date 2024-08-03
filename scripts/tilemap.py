@@ -55,9 +55,9 @@ class Tilemap:
                 rects.append(rect)
         return rects
 
-    def render(self, surface, offset=(0, 0)):
+    def render(self, surface, is_editor=False, offset=(0, 0)):
         for tile in self.tilemap.values():
-            if self.game.assets[tile['type']] is None:
+            if self.game.assets[tile['type']] is None or tile['type'] == "heal" and not is_editor:
                 continue
             tile_pos = (tile['pos'][0] * self.tile_size,
                         tile['pos'][1] * self.tile_size)

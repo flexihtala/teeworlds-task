@@ -1,6 +1,6 @@
 import socket
 import threading
-import pickle
+import json
 
 
 class GameServer:
@@ -10,8 +10,6 @@ class GameServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clients = []
         self.players = {}
-        self.map = {}
-        self.spawnpoints = []
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
         print('Сервер запущен, ожидание подключения')
@@ -19,21 +17,13 @@ class GameServer:
     def handle_client(self, conn, addr):
         try:
             while True:
-                data = pickle.loads(conn.recv(1024))
+                data = conn.recv(1024).decode()
                 if not data:
                     break
-                if 'map' in data:
-                    print('загрузил карту')
-                    if not self.map:
-                        self.map = data['map']
-                        self.spawnpoints = data['spawnpoints']
-                    continue
-                player_data = data
+                player_data = json.loads(data)
                 self.players[addr] = player_data
-                self.players[addr]['map'] = self.map
-                self.players[addr]['spawnpoints'] = self.spawnpoints
                 for client in self.clients:
-                    client.sendall(pickle.dumps(self.players))
+                    client.sendall(json.dumps(self.players).encode('utf-8'))
         except Exception as e:
             raise e
         finally:
@@ -49,11 +39,6 @@ class GameServer:
                 address = str(addr[0]) + ":" + str(addr[1])
                 print(f'Подключен к адресу {addr}')
                 self.clients.append(conn)
-                if self.map:
-                    conn.sendall(pickle.dumps({'map': self.map,
-                                               'spawnpoints': self.spawnpoints}))
-                else:
-                    conn.sendall(pickle.dumps({'map': None}))
                 threading.Thread(target=self.handle_client,
                                  args=(conn, address)).start()
         except Exception as e:

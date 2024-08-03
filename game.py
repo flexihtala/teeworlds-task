@@ -1,7 +1,7 @@
 import pygame
 import sys
 import socket
-import pickle
+import json
 import threading
 import math
 import random
@@ -15,6 +15,7 @@ from scripts.tools.rpg import rpg_bullet
 from scripts.tools.minigun import minigun_bullet
 from main_menu.menu import MainMenu
 from scripts.cheat_codes import cheat_cods
+from scripts.tools.potions.heal_potion import HealPotion
 
 
 class Game:
@@ -47,9 +48,10 @@ class Game:
         }
 
         self.tilemap = Tilemap(self, 16)
-        with open('save.json', 'rb') as file:
-            self.tilemap.tilemap = pickle.load(file)
+        with open('save.json', 'r', encoding='utf-8') as file:
+            self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
+        self.tilemap.find_heal_positions()
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
@@ -63,16 +65,12 @@ class Game:
         self.address = str(self.socket_name[0]) + ":" + str(
             self.socket_name[1])
 
-        self.send_map()
-        self.get_map()
-
         self.player_info = {}
         self.players_data = {}
         self.players = {}
         self.receive_thread = threading.Thread(target=self.receive_data)
         self.receive_thread.daemon = True
         self.receive_thread.start()
-
 
         spawnpoint_pos = self.tilemap.spawnpoint_positions[
             random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
@@ -87,6 +85,7 @@ class Game:
                                     True, (0, 0, 0)))
         self.text_rect = self.text_surface.get_rect(center=(WIDTH / 2, 100))
         self.is_warning_active = False
+        self.heals = [HealPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.heal_positions]
 
     def run(self):
         self.player.name = MainMenu(self.screen).main_menu()
@@ -96,9 +95,12 @@ class Game:
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1])
             self.render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
-            self.tilemap.render(self.display, self.render_scroll)
+            self.tilemap.render(self.display, False, self.render_scroll)
             self.player.update(self.tilemap,
                                ((self.movement[1] - self.movement[0]) * 2, 0))
+            for heal in self.heals:
+                heal.update()
+                heal.render(self.display, self.render_scroll)
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
 
@@ -180,13 +182,6 @@ class Game:
             pygame.display.update()
             self.clock.tick(FPS)
 
-    def send_map(self):
-        try:
-            self.client_socket.sendall(pickle.dumps({'map': self.tilemap.tilemap,
-                                                     'spawnpoints': self.tilemap.spawnpoint_positions}))
-        except Exception as e:
-            print(f"Ошибка при отправлении карты: {e}")
-
     def send_player_info(self):
         self.player_info['x'] = self.player.pos[0]
         self.player_info['y'] = self.player.pos[1]
@@ -201,30 +196,16 @@ class Game:
         self.player_info['nickname'] = self.player.name
         self.player_info['id'] = self.player.id
         try:
-            self.client_socket.sendall(pickle.dumps(self.player_info))
+            self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
             print(f"Ошибка при отправлении информации: {e}")
-
-    def get_map(self):
-        while True:
-            try:
-                data = pickle.loads(self.client_socket.recv(1024))
-                print(data)
-                if 'map' in data:
-                    if data['map'] is None:
-                        break
-                    self.tilemap.tilemap = data['map']
-                    self.tilemap.spawnpoint_positions = data['spawnpoints']
-                    break
-            except Exception as e:
-                print(f'Произошла ошибка при получении карты {e}')
 
     def receive_data(self):
         while True:
             try:
-                data = self.client_socket.recv(1024)
+                data = self.client_socket.recv(1024).decode()
                 if data:
-                    self.players_data = pickle.loads(data)
+                    self.players_data = json.loads(data)
                     self.players_data.pop(self.address)
                     current_addresses = set(self.players_data.keys())
                     for addr in self.players.keys():
@@ -246,8 +227,6 @@ class Game:
                             self.players[addr].name = pdata['nickname']
                             self.players[addr].id = pdata['id']
                             self.player.other_bullets = bullets
-                            self.tilemap.tilemap = pdata['map']
-                            self.tilemap.spawnpoint_positions = pdata['spawnpoints']
             except:
                 pass
 

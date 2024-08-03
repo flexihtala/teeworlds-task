@@ -33,11 +33,10 @@ class Bullet:
         if self.exploded:
             return
         bullet_rect = self.rect()
-        if is_enemy and not self.is_damaged:
+        if is_enemy:
             if self.game.player.id in self.damaged_players:
                 self.game.player.take_damage(self.damage)
                 self.apply_explosion_force(self.game.player)
-                self.is_damaged = True
                 self.explode()
 
         else:
@@ -127,4 +126,5 @@ class Bullet:
             'bullet_type': 'rpg',
             'damage': self.damage,
             'damaged_players': self.damaged_players,
+            'is_damaged': self.is_damaged,
         }
