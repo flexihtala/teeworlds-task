@@ -12,7 +12,16 @@ PHYSICS_TILES = {'grass',
                  'right_ground_wall',
                  'left_bottom_ground',
                  'bottom_ground',
-                 'right_bottom_ground'}
+                 'right_bottom_ground',
+                 'top_brick',
+                 'top_left_brick',
+                 'top_right_brick',
+                 'left_brick',
+                 'mid_brick',
+                 'right_brick',
+                 'bottom_brick',
+                 'bottom_left_brick',
+                 'bottom_right_brick'}
 
 
 class Tilemap:
@@ -42,7 +51,8 @@ class Tilemap:
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""
         tiles = list()
-        tile_pos = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
+        tile_pos = (
+        int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
         for offset in NEIGHBOUR_OFFSETS:
             check_pos = str(tile_pos[0] + offset[0]) + ';' + str(
                 tile_pos[1] + offset[1])
@@ -63,8 +73,10 @@ class Tilemap:
 
     def render(self, surface, is_editor=False, offset=(0, 0)):
         for tile in self.tilemap.values():
-            if self.game.assets[tile['type']] is None or tile['type'] == "heal" and not is_editor:
+            if self.game.assets[tile['type']] is None or tile[
+                'type'] == "heal" and not is_editor:
                 continue
             tile_pos = (tile['pos'][0] * self.tile_size,
                         tile['pos'][1] * self.tile_size)
-            surface.blit(self.game.assets[tile['type']], (tile_pos[0] - offset[0], tile_pos[1] - offset[1]))
+            surface.blit(self.game.assets[tile['type']],
+                         (tile_pos[0] - offset[0], tile_pos[1] - offset[1]))
