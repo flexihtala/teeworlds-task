@@ -43,6 +43,7 @@ class Editor:
 
         self.is_left_hold = False
         self.is_right_hold = False
+        self.spawnpoints = set()
 
     def fill_buttons_list(self):
         i = 0
@@ -71,9 +72,12 @@ class Editor:
         if not remove_tile:
             self.tilemap.tilemap[tilemap_key] = {'type': self.current_tile,
                                                  'pos': tile_pos}
+            if self.current_tile == 'spawnpoint':
+                self.spawnpoints.add(tilemap_key)
         else:
             self.tilemap.tilemap.pop(tilemap_key, None)
-
+            if self.current_tile == 'spawnpoint' and tilemap_key in self.spawnpoints:
+                self.spawnpoints.remove(tilemap_key)
 
     def run(self):
         while True:
@@ -102,9 +106,12 @@ class Editor:
                     if event.key == pygame.K_d:
                         self.scroll[1] = True
                     if event.key == pygame.K_s:
-                        print('Saving')
-                        with open('save.json', 'w', encoding='utf-8') as file:
-                            json.dump(self.tilemap.tilemap, file)
+                        if not self.spawnpoints:
+                            print('Невозможно сохранить карту без спавнпоинтов')
+                        else:
+                            print('Saving')
+                            with open('save.json', 'w', encoding='utf-8') as file:
+                                json.dump(self.tilemap.tilemap, file)
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.scroll[0] = False
