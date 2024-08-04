@@ -41,7 +41,6 @@ class MainMenu:
                     if name == "ENDofTHEprogramGG":
                         pygame.quit()
                         sys.exit()
-                    running = False
                     return name
 
                 for btn in [start_button, exit_button]:
