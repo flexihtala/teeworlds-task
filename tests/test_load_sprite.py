@@ -28,7 +28,8 @@ class TestLoadSprite(unittest.TestCase):
         test_sprite_path = 'player.png'
         loaded_sprite = load_sprite(test_sprite_path)
 
-        self.assertIsInstance(loaded_sprite, pygame.Surface, "Метод load_sprite должен возвращать объект pygame.Surface")
+        self.assertIsInstance(loaded_sprite, pygame.Surface,
+                              "Метод load_sprite должен возвращать объект pygame.Surface")
 
 
 if __name__ == '__main__':

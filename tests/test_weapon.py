@@ -37,7 +37,9 @@ class TestWeapon(unittest.TestCase):
         self.assertEqual(len(self.player.bullets), 2)
         self.player.bullets[0].update(MagicMock(), 0)
         self.assertEqual(self.player.bullets[0].pos[0], 18)
-        self.assertEqual(self.player.bullets[0].serialize(), {'bullet_type': 'minigun', 'damage': 5, 'damaged_player': -1,'direction': (1, 1),'is_exist': True,'pos': [18, 18]})
+        self.assertEqual(self.player.bullets[0].serialize(), {'bullet_type': 'minigun', 'damage': 5,
+                                                              'damaged_player': -1, 'direction': (1, 1),
+                                                              'is_exist': True, 'pos': [18, 18]})
 
     @patch('pygame.mouse.get_pos')
     def test_get_shooting_direction(self, mock_mouse_pos):

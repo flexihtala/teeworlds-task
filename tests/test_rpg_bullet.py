@@ -33,9 +33,11 @@ class TestRpgBullet(unittest.TestCase):
 
     def test_serialize(self):
         self.bullet.serialize()
-        self.assertEqual(self.bullet.serialize(), {'angle': 45, 'bullet_type': 'rpg', 'damage': 10, 'damaged_players': [], 'direction': [5, 5], 'is_bullet_flipped': True, 'is_damaged': False, 'is_exploded': False, 'pos': [0, 0]})
+        self.assertEqual(self.bullet.serialize(), {'angle': 45, 'bullet_type': 'rpg', 'damage': 10,
+                                                   'damaged_players': [], 'direction': [5, 5],
+                                                   'is_bullet_flipped': True, 'is_damaged': False,
+                                                   'is_exploded': False, 'pos': [0, 0]})
 
 
 if __name__ == '__main__':
     unittest.main()
-

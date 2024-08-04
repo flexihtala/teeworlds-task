@@ -112,7 +112,8 @@ class Game:
         self.text_rect = self.text_surface.get_rect(center=(WIDTH / 2, 100))
         self.is_warning_active = False
         self.heals = [HealPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.heal_positions]
-        self.random_potions = [RandomPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.random_potion_positions]
+        self.random_potions = [RandomPotion([pos[0] * 16, pos[1] * 16], self)
+                               for pos in self.tilemap.random_potion_positions]
         self.doors = [Door([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.door_positions]
         self.main_background = [pygame.transform.scale(pygame.image.load(f"assets/main_menu/background/{i + 1}.png"),
                                                        (WIDTH // 2, HEIGHT // 2)) for i in range(4)]
@@ -197,7 +198,8 @@ class Game:
                             self.is_cheat_menu_active = False
                             self.is_warning_active = False
                             self.input_box.text = ''
-                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN or self.input_box.is_enter_pressed:
+                    elif (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN or
+                          self.input_box.is_enter_pressed):
                         input_text = self.input_box.text
                         if input_text not in cheat_cods:
                             self.is_warning_active = True
@@ -238,6 +240,7 @@ class Game:
         self.player_info['nickname'] = self.player.name
         self.player_info['id'] = self.player.id
         self.player_info['is_e_active'] = self.player.is_e_active
+        self.player_info['is_hiding'] = self.player.is_hiding
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -271,8 +274,9 @@ class Game:
                             self.players[addr].id = pdata['id']
                             self.player.other_bullets = bullets
                             self.players[addr].is_e_active = pdata['is_e_active']
-            except:
-                pass
+                            self.players[addr].is_hiding = pdata['is_hiding']
+            except Exception as e:
+                print(e)
 
     def deserialize_bullet(self, bullet_info):
         pos = bullet_info['pos']
@@ -299,4 +303,3 @@ class Game:
 
 if __name__ == "__main__":
     Game().run()
-

@@ -1,6 +1,6 @@
 import unittest
 from scripts.player import Player
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 import os
 import pygame
 

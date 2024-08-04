@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import socket
 import json
-import threading
 from server import GameServer
 
 
@@ -25,8 +23,7 @@ class TestGameServer(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.server.start()
 
-    @patch('server.socket.socket')
-    def test_handle_client(self, mock_socket):
+    def test_handle_client(self):
         mock_conn = MagicMock()
         mock_conn.recv.side_effect = [
             json.dumps({'x': 10, 'y': 20}).encode('utf-8'),

@@ -37,5 +37,6 @@ class TestHook(unittest.TestCase):
             self.hook.pull_player()
         self.assertNotEqual(self.player.velocity, [0, 0])
 
+
 if __name__ == '__main__':
     unittest.main()

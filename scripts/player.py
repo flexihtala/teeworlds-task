@@ -33,7 +33,6 @@ class Player:
         self.other_bullets = []
         self.immortality_time = 120
         self.is_immortal = False
-        # todo норм айди
         self.id = random.randint(1, 10000)
         self.max_velocity = 2
         self.is_hiding = False
@@ -64,8 +63,6 @@ class Player:
         for rect in tilemap.hiding_tiles_positions:
             if entity_rect.colliderect(rect):
                 self.is_hiding = True
-            else:
-                self.is_hiding = False
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
                 if self.velocity[0] > 0:
@@ -109,7 +106,6 @@ class Player:
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
-        print(self.is_hiding)
         if self.hp < 1:
             return
         image = self.game.assets['player']
@@ -156,11 +152,9 @@ class Player:
             self.jumps -= 1
 
     def take_damage(self, amount):
-        print(self.immortality_time, self.is_immortal)
         if self.immortality_time > 0 or self.is_immortal:
             return
         self.hp -= amount
-        print(self.hp)
         if self.hp < 1:
             self.hp = 0
             self.die()

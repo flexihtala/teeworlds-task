@@ -3,11 +3,15 @@ from unittest.mock import patch
 import pygame
 from scripts.tilemap import Tilemap
 from editor import Editor
+import os
 
 
 class TestEditor(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    @patch('editor.load_sprite')
+    @patch("editor.load_sprite")
     def setUp(self, mock_load_sprite):
         mock_load_sprite.return_value = pygame.Surface((32, 32))
         self.editor = Editor()
@@ -29,35 +33,44 @@ class TestEditor(unittest.TestCase):
         self.editor.fill_buttons_list()
         self.assertEqual(len(self.editor.buttons), len(self.editor.assets))
 
-    @patch('pygame.mouse.get_pos')
+    @patch("pygame.mouse.get_pos")
     def test_place_tile(self, mock_get_pos):
-        self.editor.current_tile = 'grass'
+        self.editor.current_tile = "grass"
         mock_get_pos.return_value = (100, 100)
         self.editor.place_tile()
-        tile_pos = ((100 + 2 * self.editor.offset[0]) // 32, (100 + 2 * self.editor.offset[1]) // 32)
-        tilemap_key = str(tile_pos[0]) + ';' + str(tile_pos[1])
+        tile_pos = (
+            (100 + 2 * self.editor.offset[0]) // 32,
+            (100 + 2 * self.editor.offset[1]) // 32,
+        )
+        tilemap_key = str(tile_pos[0]) + ";" + str(tile_pos[1])
         self.assertIn(tilemap_key, self.editor.tilemap.tilemap)
-        self.assertEqual(self.editor.tilemap.tilemap[tilemap_key]['type'], 'grass')
+        self.assertEqual(self.editor.tilemap.tilemap[tilemap_key]["type"], "grass")
 
         self.editor.place_tile(remove_tile=True)
         self.assertNotIn(tilemap_key, self.editor.tilemap.tilemap)
 
-    @patch('pygame.transform.scale')
-    @patch('pygame.mouse.get_pressed')
-    @patch('pygame.mouse.get_pos')
-    @patch('pygame.event.get')
-    @patch('builtins.open')
-    @patch('json.dump')
-    @patch('pygame.quit')
-    def test_run(self, mock_pygame_quit, mock_json_dump, mock_open, mock_event_get, mock_mouse_get_pos,
-                 mock_mouse_get_pressed, mock_transform_scale):
+    @patch("pygame.transform.scale")
+    @patch("pygame.mouse.get_pressed")
+    @patch("pygame.mouse.get_pos")
+    @patch("pygame.event.get")
+    @patch("builtins.open")
+    @patch("json.dump")
+    @patch("pygame.quit")
+    def test_run(
+        self,
+        mock_pygame_quit,
+        mock_json_dump,
+        mock_open,
+        mock_event_get,
+        mock_mouse_get_pos,
+        mock_mouse_get_pressed,
+        mock_transform_scale,
+    ):
+        mock_pygame_quit.return_value = None
         mock_transform_scale.return_value = pygame.Surface((32, 32))
         mock_mouse_get_pressed.return_value = [0, 1]
         mock_mouse_get_pos.return_value = (100, 100)
-        mock_event_get.side_effect = [
-            [pygame.event.Event(pygame.QUIT)],
-            []
-        ]
+        mock_event_get.side_effect = [[pygame.event.Event(pygame.QUIT)], []]
 
         with self.assertRaises(SystemExit):
             self.editor.run()
@@ -66,21 +79,22 @@ class TestEditor(unittest.TestCase):
         mock_json_dump.assert_not_called()
 
         mock_event_get.side_effect = [
-            [pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_s})],
-            [pygame.event.Event(pygame.KEYUP, {'key': pygame.K_s})],
-            [pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_c})],
-            [pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1})],
-            [pygame.event.Event(pygame.MOUSEBUTTONUP, {'button': 1})],
-            [pygame.event.Event(pygame.QUIT)]
+            [pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_s})],
+            [pygame.event.Event(pygame.KEYUP, {"key": pygame.K_s})],
+            [pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_c})],
+            [pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1})],
+            [pygame.event.Event(pygame.MOUSEBUTTONUP, {"button": 1})],
+            [pygame.event.Event(pygame.QUIT)],
         ]
 
-        with patch('pygame.display.update'), patch('pygame.draw.line'), patch(
-                'pygame.draw.rect'), patch.object(self.editor, 'spawnpoints', True):
+        with patch("pygame.display.update"), patch("pygame.draw.line"), patch(
+            "pygame.draw.rect"
+        ), patch.object(self.editor, "spawnpoints", True):
             with self.assertRaises(SystemExit):
                 self.editor.run()
 
-        mock_open.assert_called_once_with('maps/save.json', 'w', encoding='utf-8')
+        mock_open.assert_called_once_with("maps/save.json", "w", encoding="utf-8")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

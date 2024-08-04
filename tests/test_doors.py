@@ -27,8 +27,11 @@ class TestHook(unittest.TestCase):
         self.assertNotEqual(self.door.distance_to_player(self.player), 0)
 
     def test_update(self):
-        with patch.object(self.door.game.player, 'is_e_active', True), patch.object(self.door, 'door_kd', 0):
+        with patch.object(self.door.game.player, "is_e_active", True), patch.object(
+            self.door, "door_kd", 0
+        ):
             self.door.update()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
