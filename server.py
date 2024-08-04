@@ -42,7 +42,7 @@ class GameServer:
                 threading.Thread(target=self.handle_client,
                                  args=(conn, address)).start()
         except Exception as e:
-            print(e)
+            raise
 
 
 if __name__ == "__main__":

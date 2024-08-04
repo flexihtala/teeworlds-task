@@ -8,7 +8,6 @@ class InputBox:
         self.rect = pygame.Rect(x, y, w, h)
         self.current_color = active_color
         self.active_color = active_color
-        self.inactive_color = inactive_color
         self.text = text
         self.screen = screen
         self.font = pygame.font.Font(None, 64)
@@ -16,8 +15,6 @@ class InputBox:
         self.is_enter_pressed = False
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            self.current_color = self.active_color
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.is_enter_pressed = True

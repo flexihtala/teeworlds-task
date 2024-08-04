@@ -35,6 +35,7 @@ class Player:
         self.is_immortal = False
         # todo норм айди
         self.id = random.randint(1, 10000)
+        self.max_velocity = 2
 
     def update(self, tilemap, movement=(0, 0)):
         self.immortality_time -= 1
@@ -51,9 +52,9 @@ class Player:
         self.collisions = {'up': False, 'down': False,
                            'right': False, 'left': False}
         if movement[0] < 0:
-            self.velocity[0] = max(self.velocity[0] - 0.1, -2)
+            self.velocity[0] = max(self.velocity[0] - 0.1, -self.max_velocity)
         if movement[0] > 0:
-            self.velocity[0] = min(self.velocity[0] + 0.1, 2)
+            self.velocity[0] = min(self.velocity[0] + 0.1, self.max_velocity)
 
         self.pos[0] += self.velocity[0]
         entity_rect = self.rect()

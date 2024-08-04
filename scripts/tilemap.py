@@ -63,7 +63,7 @@ class Tilemap:
 
     def render(self, surface, is_editor=False, offset=(0, 0)):
         for tile in self.tilemap.values():
-            if self.game.assets[tile['type']] is None or tile['type'] == "heal" and not is_editor:
+            if self.game.assets[tile['type']] is None or (tile['type'] in ("heal", "random_potion") and not is_editor):
                 continue
             tile_pos = (tile['pos'][0] * self.tile_size,
                         tile['pos'][1] * self.tile_size)

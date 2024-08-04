@@ -8,6 +8,7 @@ import random
 
 from main_menu.input_box import InputBox
 from scripts.settings import *
+from scripts.tools.potions.random_potion import RandomPotion
 from scripts.utils import load_sprite
 from scripts.player import Player
 from scripts.tilemap import Tilemap
@@ -53,6 +54,7 @@ class Game:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()
+        self.tilemap.find_random_potion_positions()
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
@@ -72,7 +74,6 @@ class Game:
         self.receive_thread = threading.Thread(target=self.receive_data)
         self.receive_thread.daemon = True
         self.receive_thread.start()
-
         spawnpoint_pos = self.tilemap.spawnpoint_positions[
             random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
         start_pos = [spawnpoint_pos[0] * 16, spawnpoint_pos[1] * 16]
@@ -87,6 +88,7 @@ class Game:
         self.text_rect = self.text_surface.get_rect(center=(WIDTH / 2, 100))
         self.is_warning_active = False
         self.heals = [HealPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.heal_positions]
+        self.random_potions = [RandomPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.random_potion_positions]
 
     def run(self):
         self.player.name = MainMenu(self.screen).main_menu()
@@ -102,6 +104,9 @@ class Game:
             for heal in self.heals:
                 heal.update()
                 heal.render(self.display, self.render_scroll)
+            for random_potion in self.random_potions:
+                random_potion.update()
+                random_potion.render(self.display, self.render_scroll)
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
 
@@ -150,6 +155,7 @@ class Game:
                             self.player.switch_weapon(-1)
 
                 else:
+                    print(self.input_box.is_enter_pressed)
                     if event.type == pygame.KEYDOWN:
                         if event.key == 96:
                             self.is_cheat_menu_active = False
@@ -173,7 +179,6 @@ class Game:
                         self.input_box.text = ""
                 self.input_box.handle_event(event)
             self.input_box.update()
-
             self.send_player_info()
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             if self.is_cheat_menu_active:
@@ -232,6 +237,7 @@ class Game:
                 pass
 
     def deserialize_bullet(self, bullet_info):
+        print(bullet_info)
         pos = bullet_info['pos']
         direction = bullet_info['direction']
         damage = bullet_info['damage']
