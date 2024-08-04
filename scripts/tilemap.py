@@ -22,7 +22,9 @@ PHYSICS_TILES = {'grass',
                  'bottom_brick',
                  'bottom_left_brick',
                  'bottom_right_brick',
-                 'closed_door'}
+                 'closed_door',
+                 'glass',
+                 'wood'}
 
 HIDING_TILES = {'bush'}
 

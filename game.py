@@ -59,7 +59,11 @@ class Game:
             'random_potion': load_sprite('tiles/random_potion.png'),
             'bush': load_sprite('tiles/bush.png'),
             'closed_door': load_sprite('tiles/closed_door.png'),
-            'opened_door': load_sprite('tiles/opened_door.png')
+            'opened_door': load_sprite('tiles/opened_door.png'),
+            'wood': load_sprite('tiles/wood.png'),
+            'glass': load_sprite('tiles/glass.png'),
+            'ground_bg': load_sprite('tiles/ground_bg.png'),
+            'wood_bg': load_sprite('tiles/wood_bg.png')
         }
 
         self.tilemap = Tilemap(self)
