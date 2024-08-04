@@ -44,17 +44,28 @@ class Game:
             'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
+            'top_brick': load_sprite('tiles/top_brick.png'),
+            'top_left_brick': load_sprite('tiles/top_left_brick.png'),
+            'top_right_brick': load_sprite('tiles/top_right_brick.png'),
+            'left_brick': load_sprite('tiles/left_brick.png'),
+            'mid_brick': load_sprite('tiles/mid_brick.png'),
+            'right_brick': load_sprite('tiles/right_brick.png'),
+            'bottom_brick': load_sprite('tiles/bottom_brick.png'),
+            'bottom_left_brick': load_sprite('tiles/bottom_left_brick.png'),
+            'bottom_right_brick': load_sprite('tiles/bottom_right_brick.png'),
             'spawnpoint': None,
             'heal': load_sprite('tiles/heal.png'),
-            'random_potion': load_sprite('tiles/random_potion.png')
+            'random_potion': load_sprite('tiles/random_potion.png'),
+            'bush': load_sprite('tiles/bush.png')
         }
 
-        self.tilemap = Tilemap(self, 16)
+        self.tilemap = Tilemap(self)
         with open('save.json', 'r', encoding='utf-8') as file:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()
         self.tilemap.find_random_potion_positions()
+        self.tilemap.find_hiding_tiles_positions()
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
@@ -109,6 +120,7 @@ class Game:
                 random_potion.render(self.display, self.render_scroll)
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
+            self.tilemap.render_hiding_tile(self.display, self.render_scroll)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -155,7 +167,6 @@ class Game:
                             self.player.switch_weapon(-1)
 
                 else:
-                    print(self.input_box.is_enter_pressed)
                     if event.type == pygame.KEYDOWN:
                         if event.key == 96:
                             self.is_cheat_menu_active = False
@@ -237,7 +248,6 @@ class Game:
                 pass
 
     def deserialize_bullet(self, bullet_info):
-        print(bullet_info)
         pos = bullet_info['pos']
         direction = bullet_info['direction']
         damage = bullet_info['damage']
