@@ -56,7 +56,9 @@ class Game:
             'spawnpoint': None,
             'heal': load_sprite('tiles/heal.png'),
             'random_potion': load_sprite('tiles/random_potion.png'),
-            'bush': load_sprite('tiles/bush.png')
+            'bush': load_sprite('tiles/bush.png'),
+            'closed_door': load_sprite('tiles/closed_door.png'),
+            'opened_door': load_sprite('tiles/opened_door.png')
         }
 
         self.tilemap = Tilemap(self)
@@ -66,6 +68,8 @@ class Game:
         self.tilemap.find_heal_positions()
         self.tilemap.find_random_potion_positions()
         self.tilemap.find_hiding_tiles_positions()
+        self.tilemap.find_door_positions()
+        print(self.tilemap.door_positions)
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)

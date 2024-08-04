@@ -43,6 +43,7 @@ class Editor:
             'spawnpoint': load_sprite('tiles/spawnpoint.png'),
             'heal': load_sprite('tiles/heal.png'),
             'random_potion': load_sprite('tiles/random_potion.png'),
+            'closed_door': load_sprite('tiles/closed_door.png'),
             'bush': load_sprite('tiles/bush.png')
         }
 

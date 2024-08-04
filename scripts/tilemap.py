@@ -21,7 +21,8 @@ PHYSICS_TILES = {'grass',
                  'right_brick',
                  'bottom_brick',
                  'bottom_left_brick',
-                 'bottom_right_brick'}
+                 'bottom_right_brick',
+                 'closed_door'}
 
 HIDING_TILES = {'bush'}
 
@@ -35,6 +36,7 @@ class Tilemap:
         self.heal_positions = list()
         self.random_potion_positions = list()
         self.hiding_tiles_positions = list()
+        self.door_positions = list()
 
     def find_spawnpoints(self):
         for tile in self.tilemap.values():
@@ -59,6 +61,11 @@ class Tilemap:
                                    tile['size'][0], tile['size'][1])
                 self.hiding_tiles_positions.append(rect)
 
+    def find_door_positions(self):
+        for tile in self.tilemap.values():
+            if tile['type'] == 'closed_door':
+                self.door_positions.append(tile['pos'])
+
     def tiles_around(self, pos):
         """Возвращает tiles из tilemap вокруг pos"""
         tiles = list()
@@ -73,13 +80,17 @@ class Tilemap:
 
     def physics_rects_around(self, pos):
         """Возвращает Rects от физических tiles из tilemap вокруг pos"""
+        tile_size = self.tile_size
         rects = list()
         for tile in self.tiles_around(pos):
             if tile['type'] in PHYSICS_TILES:
+                if tile['type'] == 'closed_door':
+                    tile_size = (16, 32)
                 rect = pygame.Rect(tile['pos'][0] * self.tile_size[0],
                                    tile['pos'][1] * self.tile_size[1],
-                                   self.tile_size[0], self.tile_size[1])
+                                   tile_size[0], tile_size[1])
                 rects.append(rect)
+        print(rects)
         return rects
 
     def render(self, surface, is_editor=False, offset=(0, 0)):
