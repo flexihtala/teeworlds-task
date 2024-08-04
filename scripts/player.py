@@ -154,9 +154,11 @@ class Player:
             self.jumps -= 1
 
     def take_damage(self, amount):
+        print(self.immortality_time, self.is_immortal)
         if self.immortality_time > 0 or self.is_immortal:
             return
         self.hp -= amount
+        print(self.hp)
         if self.hp < 1:
             self.hp = 0
             self.die()

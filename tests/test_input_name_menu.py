@@ -51,3 +51,6 @@ class TestMainMenu(unittest.TestCase):
             self.assertEqual(self.input_name_menu.is_warning_active, True)
             self.assertEqual(result, 'w')
 
+if __name__ == '__main__':
+    unittest.main()
+

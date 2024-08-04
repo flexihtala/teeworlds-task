@@ -9,15 +9,13 @@ class TestEditor(unittest.TestCase):
 
     @patch('editor.load_sprite')
     def setUp(self, mock_load_sprite):
-        # Замена загрузки спрайтов на создание пустого Surface
         mock_load_sprite.return_value = pygame.Surface((32, 32))
         self.editor = Editor()
 
     def test_init(self):
         self.assertIsInstance(self.editor, Editor)
-        self.assertEqual(self.editor.scroll, [False, False])
-        self.assertEqual(self.editor.offset, 0)
-        self.assertEqual(self.editor.rows, 20)
+        self.assertEqual(self.editor.offset, [0, 0])
+        self.assertEqual(self.editor.rows, 50)
         self.assertEqual(self.editor.cols, 50)
         self.assertEqual(self.editor.tile_size, 16)
         self.assertIsInstance(self.editor.assets, dict)
@@ -36,7 +34,7 @@ class TestEditor(unittest.TestCase):
         self.editor.current_tile = 'grass'
         mock_get_pos.return_value = (100, 100)
         self.editor.place_tile()
-        tile_pos = ((100 + 2 * self.editor.offset) // 32, 100 // 32)
+        tile_pos = ((100 + 2 * self.editor.offset[0]) // 32, (100 + 2 * self.editor.offset[1]) // 32)
         tilemap_key = str(tile_pos[0]) + ';' + str(tile_pos[1])
         self.assertIn(tilemap_key, self.editor.tilemap.tilemap)
         self.assertEqual(self.editor.tilemap.tilemap[tilemap_key]['type'], 'grass')
@@ -70,13 +68,14 @@ class TestEditor(unittest.TestCase):
         mock_event_get.side_effect = [
             [pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_s})],
             [pygame.event.Event(pygame.KEYUP, {'key': pygame.K_s})],
+            [pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_c})],
             [pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'button': 1})],
             [pygame.event.Event(pygame.MOUSEBUTTONUP, {'button': 1})],
             [pygame.event.Event(pygame.QUIT)]
         ]
 
         with patch('pygame.display.update'), patch('pygame.draw.line'), patch(
-                'pygame.draw.rect'):
+                'pygame.draw.rect'), patch.object(self.editor, 'spawnpoints', True):
             with self.assertRaises(SystemExit):
                 self.editor.run()
 

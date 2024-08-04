@@ -50,7 +50,6 @@ class RandomPotion:
 
     def apply_buff(self):
         self.is_buff_active = True
-        print("buff" + self.current_buff)
         if self.current_buff == "speed_up":
             self.game.player.max_velocity = 4
         elif self.current_buff == "immortality":
@@ -62,7 +61,6 @@ class RandomPotion:
         self.text = self.all_buffs[self.current_buff]
 
     def apply_debuff(self):
-        print("debuff" + self.current_buff)
         if self.current_buff == "speed_up":
             self.game.player.max_velocity = 2
         elif self.current_buff == "immortality":
@@ -78,7 +76,6 @@ class RandomPotion:
         if self.is_active:
             surface.blit(self.image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
         if self.is_text_active:
-            print(self.text)
             render_text = pygame.font.Font(None, 28).render(self.text, True, self.text_color)
             text_rect = render_text.get_rect(center=(self.pos[0] + 5, int(self.pos[1]) - 40))
             text_rect.x = int(text_rect.x - offset[0])

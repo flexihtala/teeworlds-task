@@ -41,7 +41,7 @@ class GameServer:
                 self.clients.append(conn)
                 threading.Thread(target=self.handle_client,
                                  args=(conn, address)).start()
-        except Exception as e:
+        except Exception:
             raise
 
 
