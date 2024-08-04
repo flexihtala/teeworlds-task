@@ -91,6 +91,7 @@ class TestGame(unittest.TestCase):
                 'hp': 100,
                 'nickname': '',
                 'id': game.player.id,
+                'is_e_active': False
             }
 
             mock_socket_obj.sendall.assert_called_once_with('{"mocked": "data"}'.encode())

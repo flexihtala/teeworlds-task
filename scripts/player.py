@@ -37,6 +37,7 @@ class Player:
         self.id = random.randint(1, 10000)
         self.max_velocity = 2
         self.is_hiding = False
+        self.is_e_active = False
 
     def update(self, tilemap, movement=(0, 0)):
         self.is_hiding = False

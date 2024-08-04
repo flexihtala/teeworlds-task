@@ -17,6 +17,7 @@ from scripts.tools.minigun import minigun_bullet
 from main_menu.menu import MainMenu
 from scripts.cheat_codes import cheat_cods
 from scripts.tools.potions.heal_potion import HealPotion
+from scripts.tools.door import Door
 
 
 class Game:
@@ -62,14 +63,13 @@ class Game:
         }
 
         self.tilemap = Tilemap(self)
-        with open('save.json', 'r', encoding='utf-8') as file:
+        with open('maps/save.json', 'r', encoding='utf-8') as file:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()
         self.tilemap.find_random_potion_positions()
         self.tilemap.find_hiding_tiles_positions()
         self.tilemap.find_door_positions()
-        print(self.tilemap.door_positions)
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
@@ -104,11 +104,16 @@ class Game:
         self.is_warning_active = False
         self.heals = [HealPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.heal_positions]
         self.random_potions = [RandomPotion([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.random_potion_positions]
+        self.doors = [Door([pos[0] * 16, pos[1] * 16], self) for pos in self.tilemap.door_positions]
+        self.main_background = [pygame.transform.scale(pygame.image.load(f"assets/main_menu/background/{i + 1}.png"),
+                                                       (WIDTH // 2, HEIGHT // 2)) for i in range(4)]
 
     def run(self):
         self.player.name = MainMenu(self.screen).main_menu()
         while True:
-            self.display.fill(BACKGROUND_COLOR)
+            self.screen.fill((0, 0, 0))
+            for i in self.main_background:
+                self.display.blit(i, (0, 0))
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0])
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1])
             self.render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
@@ -122,6 +127,9 @@ class Game:
             for random_potion in self.random_potions:
                 random_potion.update()
                 random_potion.render(self.display, self.render_scroll)
+            for door in self.doors:
+                door.update()
+                door.render(self.display, self.render_scroll)
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
             self.tilemap.render_hiding_tile(self.display, self.render_scroll)
@@ -135,6 +143,8 @@ class Game:
                         if event.key == 96:
                             self.is_cheat_menu_active = True
                             self.input_box.text = ""
+                        if event.key == pygame.K_e:
+                            self.player.is_e_active = True
                         if event.key == pygame.K_a:
                             self.movement[0] = True
                         if event.key == pygame.K_d:
@@ -146,6 +156,8 @@ class Game:
                         if event.key == pygame.K_a:
                             self.movement[0] = False
                             self.player.velocity[0] = 0
+                        if event.key == pygame.K_e:
+                            self.player.is_e_active = False
                         if event.key == pygame.K_d:
                             self.movement[1] = False
                             self.player.velocity[0] = 0
@@ -216,6 +228,7 @@ class Game:
         self.player_info['hp'] = self.player.hp
         self.player_info['nickname'] = self.player.name
         self.player_info['id'] = self.player.id
+        self.player_info['is_e_active'] = self.player.is_e_active
         try:
             self.client_socket.sendall(json.dumps(self.player_info).encode())
         except Exception as e:
@@ -248,6 +261,7 @@ class Game:
                             self.players[addr].name = pdata['nickname']
                             self.players[addr].id = pdata['id']
                             self.player.other_bullets = bullets
+                            self.players[addr].is_e_active = pdata['is_e_active']
             except:
                 pass
 

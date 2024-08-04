@@ -131,7 +131,7 @@ class Editor:
                             print('Невозможно сохранить карту без спавнпоинтов')
                         else:
                             print('Saving')
-                            with open('save.json', 'w', encoding='utf-8') as file:
+                            with open('maps/save.json', 'w', encoding='utf-8') as file:
                                 json.dump(self.tilemap.tilemap, file)
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:

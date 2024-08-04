@@ -90,13 +90,12 @@ class Tilemap:
                                    tile['pos'][1] * self.tile_size[1],
                                    tile_size[0], tile_size[1])
                 rects.append(rect)
-        print(rects)
         return rects
 
     def render(self, surface, is_editor=False, offset=(0, 0)):
         for tile in self.tilemap.values():
             if (self.game.assets[tile['type']] is None or
-                    (tile['type'] in ("heal", "random_potion") and not is_editor) or
+                    (tile['type'] in ("heal", "random_potion", "opened_door", "closed_door") and not is_editor) or
                     'hide' in tile):
                 continue
             tile_pos = (tile['pos'][0] * self.tile_size[0],

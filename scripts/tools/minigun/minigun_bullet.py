@@ -47,7 +47,6 @@ class Bullet:
                     self.damaged_player = player.id
                     self.is_damaged = True
 
-        # Check for collisions with tiles
         bullet_rect = self.rect()
         for rect in tilemap.physics_rects_around(self.pos):
             if bullet_rect.colliderect(rect):

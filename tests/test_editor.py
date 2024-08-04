@@ -79,7 +79,7 @@ class TestEditor(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self.editor.run()
 
-        mock_open.assert_called_once_with('save.json', 'w', encoding='utf-8')
+        mock_open.assert_called_once_with('maps/save.json', 'w', encoding='utf-8')
 
 
 if __name__ == '__main__':

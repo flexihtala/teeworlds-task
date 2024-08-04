@@ -26,7 +26,6 @@ class HealPotion:
                         self.is_active = False
                         self.timer = 0
             if self.game.player.rect().colliderect(heal_rect):
-                print(1)
                 if self.game.player.hp < self.game.player.max_hp:
                     self.game.player.hp = min(self.game.player.max_hp, self.game.player.hp + self.heal_power)
                     self.is_active = False
