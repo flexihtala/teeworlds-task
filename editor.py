@@ -22,27 +22,28 @@ class Editor:
         self.tile_size = 16
 
         self.assets = {
-            'grass': load_sprite('tiles/grass.png'),
             'left_grass': load_sprite('tiles/left_grass.png'),
+            'grass': load_sprite('tiles/grass.png'),
             'right_grass': load_sprite('tiles/right_grass.png'),
             'left_ground_wall': load_sprite('tiles/left_ground_wall.png'),
-            'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
             'ground': load_sprite('tiles/ground.png'),
+            'right_ground_wall': load_sprite('tiles/right_ground_wall.png'),
             'left_bottom_ground': load_sprite('tiles/left_bottom_ground.png'),
             'bottom_ground': load_sprite('tiles/bottom_ground.png'),
             'right_bottom_ground': load_sprite('tiles/right_bottom_ground.png'),
-            'top_brick': load_sprite('tiles/top_brick.png'),
             'top_left_brick': load_sprite('tiles/top_left_brick.png'),
+            'top_brick': load_sprite('tiles/top_brick.png'),
             'top_right_brick': load_sprite('tiles/top_right_brick.png'),
             'left_brick': load_sprite('tiles/left_brick.png'),
             'mid_brick': load_sprite('tiles/mid_brick.png'),
             'right_brick': load_sprite('tiles/right_brick.png'),
-            'bottom_brick': load_sprite('tiles/bottom_brick.png'),
             'bottom_left_brick': load_sprite('tiles/bottom_left_brick.png'),
+            'bottom_brick': load_sprite('tiles/bottom_brick.png'),
             'bottom_right_brick': load_sprite('tiles/bottom_right_brick.png'),
             'spawnpoint': load_sprite('tiles/spawnpoint.png'),
             'heal': load_sprite('tiles/heal.png'),
-            'random_potion': load_sprite('tiles/random_potion.png')
+            'random_potion': load_sprite('tiles/random_potion.png'),
+            'bush': load_sprite('tiles/bush.png')
         }
 
         self.buttons = {}
@@ -59,9 +60,9 @@ class Editor:
         i = 0
         j = 0
         for asset in self.assets.items():
-            self.buttons[asset[0]] = TileButton(425 + j, (i // 2) * 32 + 16, asset[1], 1.5)
+            self.buttons[asset[0]] = TileButton(425 + j, (i // 3) * 32 + 16, asset[1], 1.5)
             i += 1
-            j = 32 * (i % 2)
+            j = 32 * (i % 3)
 
     def draw_grid(self):
         for col in range(self.cols + 1):
@@ -85,6 +86,9 @@ class Editor:
                                                  'pos': tile_pos}
             if self.current_tile == 'spawnpoint':
                 self.spawnpoints.add(tilemap_key)
+            if self.current_tile == 'bush':
+                self.tilemap.tilemap[tilemap_key]['hide'] = True
+                self.tilemap.tilemap[tilemap_key]['size'] = (48, 32)
         else:
             self.tilemap.tilemap.pop(tilemap_key, None)
             if self.current_tile == 'spawnpoint' and tilemap_key in self.spawnpoints:
@@ -92,10 +96,10 @@ class Editor:
 
     def run(self):
         while True:
-            print(self.offset)
             self.display.fill((14, 219, 248))
             self.draw_grid()
             self.tilemap.render(self.display, True, self.offset)
+            self.tilemap.render_hiding_tile(self.display, self.offset)
             pygame.draw.rect(self.display, 'gray',
                              pygame.Rect(0, 304, 400, 100))
             pygame.draw.rect(self.display, 'gray',

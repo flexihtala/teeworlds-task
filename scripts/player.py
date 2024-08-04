@@ -35,8 +35,10 @@ class Player:
         self.is_immortal = False
         # todo норм айди
         self.id = random.randint(1, 10000)
+        self.is_hiding = False
 
     def update(self, tilemap, movement=(0, 0)):
+        self.is_hiding = False
         self.immortality_time -= 1
         self.mouse_pos = pygame.mouse.get_pos()
         self.bullets = [bullet for bullet in self.bullets if bullet.is_exist]
@@ -57,6 +59,11 @@ class Player:
 
         self.pos[0] += self.velocity[0]
         entity_rect = self.rect()
+        for rect in tilemap.hiding_tiles_positions:
+            if entity_rect.colliderect(rect):
+                self.is_hiding = True
+            else:
+                self.is_hiding = False
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
                 if self.velocity[0] > 0:
@@ -100,21 +107,25 @@ class Player:
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
+
         if self.hp < 1:
             return
         image = self.game.assets['player']
         if self.direction == 'right':
             image = pygame.transform.flip(image, True, False)
-        surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
-
+        if not self.is_hiding:
+            surface.blit(image, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
+            self.current_weapon.render(self.game.display, self.mouse_pos,
+                                       self.game.render_scroll)
         self.hook.render(self.game.display, self.game.render_scroll)
-        self.current_weapon.render(self.game.display, self.mouse_pos, self.game.render_scroll)
+
         for bullet in self.bullets:
             bullet.render(surface, offset)
         for bullet in self.other_bullets:
             bullet.render(surface, offset)
-        self.render_health_bar(surface, offset)
-        self.render_name(surface, offset)
+        if not self.is_hiding:
+            self.render_health_bar(surface, offset)
+            self.render_name(surface, offset)
 
     def render_health_bar(self, surface, offset=(0, 0)):
         bar_width = 20

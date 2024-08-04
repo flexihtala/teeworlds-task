@@ -54,14 +54,16 @@ class Game:
             'bottom_right_brick': load_sprite('tiles/bottom_right_brick.png'),
             'spawnpoint': None,
             'heal': load_sprite('tiles/heal.png'),
-            'random_potion': load_sprite('tiles/random_potion.png')
+            'random_potion': load_sprite('tiles/random_potion.png'),
+            'bush': load_sprite('tiles/bush.png')
         }
 
-        self.tilemap = Tilemap(self, 16)
+        self.tilemap = Tilemap(self)
         with open('save.json', 'r', encoding='utf-8') as file:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()
+        self.tilemap.find_hiding_tiles_positions()
 
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
@@ -113,6 +115,7 @@ class Game:
                 heal.render(self.display, self.render_scroll)
             self.player.render(self.display, self.render_scroll)
             self.render_players(self.render_scroll)
+            self.tilemap.render_hiding_tile(self.display, self.render_scroll)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
