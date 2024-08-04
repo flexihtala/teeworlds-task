@@ -17,7 +17,7 @@ class GameServer:
     def handle_client(self, conn, addr):
         try:
             while True:
-                data = conn.recv(1024).decode()
+                data = conn.recv(4096).decode()
                 if not data:
                     break
                 player_data = json.loads(data)

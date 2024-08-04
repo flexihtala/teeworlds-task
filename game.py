@@ -249,7 +249,7 @@ class Game:
     def receive_data(self):
         while True:
             try:
-                data = self.client_socket.recv(1024).decode()
+                data = self.client_socket.recv(4096).decode()
                 if data:
                     self.players_data = json.loads(data)
                     self.players_data.pop(self.address)
