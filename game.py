@@ -63,7 +63,12 @@ class Game:
             'wood': load_sprite('tiles/wood.png'),
             'glass': load_sprite('tiles/glass.png'),
             'ground_bg': load_sprite('tiles/ground_bg.png'),
-            'wood_bg': load_sprite('tiles/wood_bg.png')
+            'wood_bg': load_sprite('tiles/wood_bg.png'),
+            'gray_block': load_sprite('tiles/gray_block.png'),
+            'gray_block_bg': load_sprite('tiles/gray_block_bg.png'),
+            'big_wall': load_sprite('tiles/big_wall.png'),
+            'closed_gray_door': load_sprite('tiles/closed_gray_door.png'),
+            'opened_gray_door': load_sprite('tiles/opened_gray_door.png')
         }
 
         self.tilemap = Tilemap(self)

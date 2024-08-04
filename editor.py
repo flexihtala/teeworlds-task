@@ -42,13 +42,17 @@ class Editor:
             'bottom_right_brick': load_sprite('tiles/bottom_right_brick.png'),
             'wood': load_sprite('tiles/wood.png'),
             'glass': load_sprite('tiles/glass.png'),
+            'gray_block': load_sprite('tiles/gray_block.png'),
             'ground_bg': load_sprite('tiles/ground_bg.png'),
             'wood_bg': load_sprite('tiles/wood_bg.png'),
+            'gray_block_bg': load_sprite('tiles/gray_block_bg.png'),
             'spawnpoint': load_sprite('tiles/spawnpoint.png'),
             'heal': load_sprite('tiles/heal.png'),
             'random_potion': load_sprite('tiles/random_potion.png'),
             'closed_door': load_sprite('tiles/closed_door.png'),
-            'bush': load_sprite('tiles/bush.png')
+            'closed_gray_door': load_sprite('tiles/closed_gray_door.png'),
+            'bush': load_sprite('tiles/bush.png'),
+            'big_wall': load_sprite('tiles/big_wall.png')
         }
 
         self.buttons = {}
@@ -56,6 +60,8 @@ class Editor:
         self.current_tile = None
 
         self.tilemap = Tilemap(self)
+        with open('maps/save.json', 'r', encoding='utf-8') as file:
+            self.tilemap.tilemap = json.load(file)
 
         self.is_left_hold = False
         self.is_right_hold = False
@@ -94,6 +100,9 @@ class Editor:
             if self.current_tile == 'bush':
                 self.tilemap.tilemap[tilemap_key]['hide'] = True
                 self.tilemap.tilemap[tilemap_key]['size'] = (48, 32)
+            if self.current_tile == 'big_wall':
+                self.tilemap.tilemap[tilemap_key]['hide'] = True
+                self.tilemap.tilemap[tilemap_key]['size'] = (48, 48)
         else:
             self.tilemap.tilemap.pop(tilemap_key, None)
             if self.current_tile == 'spawnpoint' and tilemap_key in self.spawnpoints:

@@ -23,10 +23,13 @@ PHYSICS_TILES = {'grass',
                  'bottom_left_brick',
                  'bottom_right_brick',
                  'closed_door',
+                 'closed_gray_door',
                  'glass',
-                 'wood'}
+                 'wood',
+                 'gray_block'}
 
-HIDING_TILES = {'bush'}
+HIDING_TILES = {'bush',
+                'big_wall'}
 
 
 class Tilemap:
@@ -65,7 +68,7 @@ class Tilemap:
 
     def find_door_positions(self):
         for tile in self.tilemap.values():
-            if tile['type'] == 'closed_door':
+            if tile['type'] == 'closed_door' or tile['type'] == 'closed_gray_door':
                 self.door_positions.append(tile['pos'])
 
     def tiles_around(self, pos):
@@ -86,7 +89,7 @@ class Tilemap:
         rects = list()
         for tile in self.tiles_around(pos):
             if tile['type'] in PHYSICS_TILES:
-                if tile['type'] == 'closed_door':
+                if tile['type'] == 'closed_door' or tile['type'] == 'closed_gray_door':
                     tile_size = (16, 32)
                 rect = pygame.Rect(tile['pos'][0] * self.tile_size[0],
                                    tile['pos'][1] * self.tile_size[1],
@@ -97,7 +100,8 @@ class Tilemap:
     def render(self, surface, is_editor=False, offset=(0, 0)):
         for tile in self.tilemap.values():
             if (self.game.assets[tile['type']] is None or
-                    (tile['type'] in ("heal", "random_potion", "opened_door", "closed_door") and not is_editor) or
+                    (tile['type'] in ("heal", "random_potion", "opened_door", "closed_door", "opened_gray_door", "closed_gray_door")
+                     and not is_editor) or
                     'hide' in tile):
                 continue
             tile_pos = (tile['pos'][0] * self.tile_size[0],

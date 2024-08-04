@@ -109,6 +109,7 @@ class Player:
                            self.size[0], self.size[1])
 
     def render(self, surface, offset=(0, 0)):
+        print(self.is_hiding)
         if self.hp < 1:
             return
         image = self.game.assets['player']
