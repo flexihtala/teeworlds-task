@@ -7,12 +7,13 @@ from main_menu.choose_level_menu import LevelMenu
 
 
 class MainMenu:
-    def __init__(self, screen):
+    def __init__(self, screen, show_choose_level):
         # задний фон
         self.main_background = [pygame.transform.scale(pygame.image.load(f"assets/main_menu/background/{i + 1}.png"),
                                                        (WIDTH, HEIGHT)) for i in range(4)]
         self.map = ''
         self.screen = screen
+        self.show_choose_level = show_choose_level
 
     def main_menu(self):
         start_button = ImageButton(WIDTH/2-(252/2), 250, 252, 74, "", "assets/main_menu/start_button.png")
@@ -39,7 +40,8 @@ class MainMenu:
                     sys.exit()
 
                 if event.type == pygame.USEREVENT and event.button == start_button:
-                    self.map = LevelMenu(self.screen).run()
+                    if self.show_choose_level:
+                        self.map = LevelMenu(self.screen).run()
                     name = InputNameMenu(self.screen).run()
                     if name == "ENDofTHEprogramGG":
                         pygame.quit()

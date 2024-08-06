@@ -87,14 +87,15 @@ class Game:
         received_map = self.get_map()
 
         self.tilemap = Tilemap(self)
-        name, self.map = MainMenu(self.screen).main_menu()
 
         if received_map is None:
+            name, self.map = MainMenu(self.screen, True).main_menu()
             with open(f'maps/{self.map}.json', 'r', encoding='utf-8') as file:
                 self.tilemap.tilemap = json.load(file)
             self.client_socket.sendall(json.dumps(
                 {'map': self.tilemap.tilemap}).encode())
         else:
+            name, _ = MainMenu(self.screen, False).main_menu()
             self.tilemap.tilemap = received_map
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()

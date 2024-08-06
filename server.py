@@ -34,6 +34,8 @@ class GameServer:
         finally:
             conn.close()
             self.clients.remove(conn)
+            if not self.clients:
+                self.map = {}
             self.players.pop(addr)
             print(f'Соединение с {addr} разорвано')
 
