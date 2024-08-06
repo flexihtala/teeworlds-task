@@ -12,15 +12,20 @@ class GameServer:
         self.players = {}
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
+        self.map = {}
         print('Сервер запущен, ожидание подключения')
 
     def handle_client(self, conn, addr):
         try:
             while True:
-                data = conn.recv(4096).decode()
+                data = conn.recv(262144).decode()
                 if not data:
                     break
-                player_data = json.loads(data)
+                loaded_data = json.loads(data)
+                if 'map' in loaded_data:
+                    self.map = loaded_data['map']
+                    continue
+                player_data = loaded_data
                 self.players[addr] = player_data
                 for client in self.clients:
                     client.sendall(json.dumps(self.players).encode('utf-8'))
@@ -39,6 +44,10 @@ class GameServer:
                 address = str(addr[0]) + ":" + str(addr[1])
                 print(f'Подключен к адресу {addr}')
                 self.clients.append(conn)
+                if not self.map:
+                    conn.sendall(json.dumps({'map': None}).encode())
+                else:
+                    conn.sendall(json.dumps({'map': self.map}).encode())
                 threading.Thread(target=self.handle_client,
                                  args=(conn, address)).start()
         except Exception:

@@ -72,16 +72,6 @@ class Game:
             'opened_gray_door': load_sprite('tiles/opened_gray_door.png')
         }
 
-        self.tilemap = Tilemap(self)
-        name, self.map = MainMenu(self.screen).main_menu()
-        with open(f'maps/{self.map}.json', 'r', encoding='utf-8') as file:
-            self.tilemap.tilemap = json.load(file)
-        self.tilemap.find_spawnpoints()
-        self.tilemap.find_heal_positions()
-        self.tilemap.find_random_potion_positions()
-        self.tilemap.find_hiding_tiles_positions()
-        self.tilemap.find_door_positions()
-
         self.scroll = [0, 0]
         self.render_scroll = (0, 0)
         self.camera_speed = 30
@@ -93,6 +83,24 @@ class Game:
         self.socket_name = self.client_socket.getsockname()
         self.address = str(self.socket_name[0]) + ":" + str(
             self.socket_name[1])
+
+        received_map = self.get_map()
+
+        self.tilemap = Tilemap(self)
+        name, self.map = MainMenu(self.screen).main_menu()
+
+        if received_map is None:
+            with open(f'maps/{self.map}.json', 'r', encoding='utf-8') as file:
+                self.tilemap.tilemap = json.load(file)
+            self.client_socket.sendall(json.dumps(
+                {'map': self.tilemap.tilemap}).encode())
+        else:
+            self.tilemap.tilemap = received_map
+        self.tilemap.find_spawnpoints()
+        self.tilemap.find_heal_positions()
+        self.tilemap.find_random_potion_positions()
+        self.tilemap.find_hiding_tiles_positions()
+        self.tilemap.find_door_positions()
 
         self.player_info = {}
         self.players_data = {}
@@ -301,6 +309,15 @@ class Game:
     def render_players(self, render_scroll):
         for player in self.players.values():
             player.render(self.display, render_scroll)
+
+    def get_map(self):
+        try:
+            while True:
+                data = json.loads(self.client_socket.recv(262144).decode())
+                if 'map' in data:
+                    return data['map']
+        except Exception as e:
+            print(f"Произошла ошибка при получении карты: {e}")
 
 
 if __name__ == "__main__":
