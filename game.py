@@ -15,6 +15,7 @@ from scripts.tilemap import Tilemap
 from scripts.tools.rpg import rpg_bullet
 from scripts.tools.minigun import minigun_bullet
 from main_menu.menu import MainMenu
+from main_menu.choose_level_menu import LevelMenu
 from scripts.cheat_codes import cheat_cods
 from scripts.tools.potions.heal_potion import HealPotion
 from scripts.tools.door import Door
@@ -72,7 +73,8 @@ class Game:
         }
 
         self.tilemap = Tilemap(self)
-        with open('maps/save.json', 'r', encoding='utf-8') as file:
+        name, self.map = MainMenu(self.screen).main_menu()
+        with open(f'maps/{self.map}.json', 'r', encoding='utf-8') as file:
             self.tilemap.tilemap = json.load(file)
         self.tilemap.find_spawnpoints()
         self.tilemap.find_heal_positions()
@@ -102,6 +104,7 @@ class Game:
             random.randint(0, len(self.tilemap.spawnpoint_positions)) - 1]
         start_pos = [spawnpoint_pos[0] * 16, spawnpoint_pos[1] * 16]
         self.player = Player(self, start_pos, (10, 16))
+        self.player.name = name
 
         self.is_cheat_menu_active = False
         self.input_box = InputBox(5, 5, 300, 48, pygame.Color('black'),
@@ -119,7 +122,6 @@ class Game:
                                                        (WIDTH // 2, HEIGHT // 2)) for i in range(4)]
 
     def run(self):
-        self.player.name = MainMenu(self.screen).main_menu()
         while True:
             self.screen.fill((0, 0, 0))
             for i in self.main_background:
